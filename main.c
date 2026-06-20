@@ -186,7 +186,9 @@ void main(void)
         {
         case SOCK_CLOSED:
 
+            close(SOCK_TCPS);
             socket(SOCK_TCPS, Sn_MR_TCP, TCP_PORT, 0);
+
             send_enable = 0;
 
             break;
@@ -204,6 +206,7 @@ void main(void)
                 setSn_IR(SOCK_TCPS, Sn_IR_CON);
             }
 
+            /* Receive command */
             len = getSn_RX_RSR(SOCK_TCPS);
 
             if(len > 0)
@@ -216,13 +219,13 @@ void main(void)
 
                 recv(SOCK_TCPS, rxbuf, len);
 
-                /* Stop sending */
+                /* Stop streaming */
                 if(rxbuf[0]=='o' && rxbuf[1]=='k' && rxbuf[2]=='k')
                 {
                     send_enable = 0;
                 }
 
-                /* Start sending */
+                /* Start streaming */
                 else if(rxbuf[0]=='o' && rxbuf[1]=='k')
                 {
                     send_enable = 1;
@@ -271,6 +274,7 @@ void main(void)
                     GPIO_WriteLow(GPIOC, GPIO_PIN_4);
             }
 
+            /* Stream DI status */
             if(send_enable)
             {
                 txbuf[0] = (GPIO_ReadInputPin(GPIOD, GPIO_PIN_2)==RESET)?'1':'0';
@@ -281,7 +285,12 @@ void main(void)
                 txbuf[4] = '\r';
                 txbuf[5] = '\n';
 
-                send(SOCK_TCPS, txbuf, 6);
+                if(send(SOCK_TCPS, txbuf, 6) <= 0)
+                {
+                    disconnect(SOCK_TCPS);
+                    close(SOCK_TCPS);
+                    send_enable = 0;
+                }
 
                 delay_ms(500);
             }
@@ -291,6 +300,19 @@ void main(void)
         case SOCK_CLOSE_WAIT:
 
             disconnect(SOCK_TCPS);
+            close(SOCK_TCPS);
+
+            send_enable = 0;
+
+            break;
+
+        case SOCK_FIN_WAIT:
+        case SOCK_CLOSING:
+        case SOCK_TIME_WAIT:
+        case SOCK_LAST_ACK:
+
+            close(SOCK_TCPS);
+
             send_enable = 0;
 
             break;

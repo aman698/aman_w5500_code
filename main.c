@@ -4,7 +4,7 @@
 #include "stm8s_clk.h"
 #include "wizchip_conf.h"
 #include "socket.h"
-
+#include <string.h>   // ADD THIS
 /* Hardware Reset Input */
 #define HARDRST_PORT    GPIOB
 #define HARDRST_PIN     GPIO_PIN_7
@@ -34,15 +34,10 @@
 #define SOCK_TCPS      0
 #define TCP_PORT       5000
 
-#define W5500_CS_PORT  GPIOA
-#define W5500_CS_PIN   GPIO_PIN_3
 
-#define W5500_RST_PORT GPIOE
-#define W5500_RST_PIN  GPIO_PIN_5
-
-uint8_t txsize[8]={2,0,0,0,0,0,0,0};
-uint8_t rxsize[8]={2,0,0,0,0,0,0,0};
-
+uint8_t txsize[8]={8,8,0,0,0,0,0,0};
+uint8_t rxsize[8]={8,8,0,0,0,0,0,0};
+uint8_t changed = 0;
 uint8_t rxbuf[32];
 
 wiz_NetInfo netinfo=
@@ -168,9 +163,14 @@ void GPIO_Config(void)
 void main(void)
 {
     uint16_t len;
-    uint8_t i;
-    uint8_t send_enable = 0;
+    uint16_t free;
     uint8_t txbuf[6];
+
+    uint8_t curr_state[4];
+    uint8_t prev_state[4] = {'0','0','0','0'};
+    uint8_t changed;
+
+    uint16_t send_timer = 0;
 
     CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
 
@@ -184,137 +184,151 @@ void main(void)
     {
         switch(getSn_SR(SOCK_TCPS))
         {
-        case SOCK_CLOSED:
 
+        /* ================= SOCKET CLOSED ================= */
+        case SOCK_CLOSED:
             close(SOCK_TCPS);
             socket(SOCK_TCPS, Sn_MR_TCP, TCP_PORT, 0);
-
-            send_enable = 0;
-
+            delay_ms(100);
             break;
 
+        /* ================= LISTEN ================= */
         case SOCK_INIT:
-
             listen(SOCK_TCPS);
-
             break;
 
+        /* ================= CONNECTED ================= */
         case SOCK_ESTABLISHED:
 
+            /* ✅ connection event */
             if(getSn_IR(SOCK_TCPS) & Sn_IR_CON)
             {
                 setSn_IR(SOCK_TCPS, Sn_IR_CON);
+
+                curr_state[0]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_2)==RESET)?'1':'0';
+                curr_state[1]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_3)==RESET)?'1':'0';
+                curr_state[2]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_4)==RESET)?'1':'0';
+                curr_state[3]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_7)==RESET)?'1':'0';
+
+                txbuf[0]=curr_state[0];
+                txbuf[1]=curr_state[1];
+                txbuf[2]=curr_state[2];
+                txbuf[3]=curr_state[3];
+                txbuf[4]='\r';
+                txbuf[5]='\n';
+
+                free = getSn_TX_FSR(SOCK_TCPS);
+
+                if(free >= 16)
+                {
+                    send(SOCK_TCPS, txbuf, 6);
+                    delay_ms(5);   // ✅ buffer flush
+                }
+
+                prev_state[0]=curr_state[0];
+                prev_state[1]=curr_state[1];
+                prev_state[2]=curr_state[2];
+                prev_state[3]=curr_state[3];
             }
 
-            /* Receive command */
+            /* ================= RECEIVE ================= */
             len = getSn_RX_RSR(SOCK_TCPS);
 
-            if(len > 0)
+            if(len >= 4)
             {
-                if(len > sizeof(rxbuf))
-                    len = sizeof(rxbuf);
-
-                for(i = 0; i < sizeof(rxbuf); i++)
-                    rxbuf[i] = 0;
+                if(len > sizeof(rxbuf)-1)
+                    len = sizeof(rxbuf)-1;
 
                 recv(SOCK_TCPS, rxbuf, len);
 
-                /* Stop streaming */
-                if(rxbuf[0]=='o' && rxbuf[1]=='k' && rxbuf[2]=='k')
+                if(rxbuf[0]=='R' && rxbuf[2]==',')
                 {
-                    send_enable = 0;
+                    uint8_t relay = rxbuf[1]-'0';
+                    uint8_t state = rxbuf[3]-'0';
+
+                    GPIO_TypeDef* port = 0;
+                    uint8_t pin = 0;
+
+                    switch(relay)
+                    {
+                        case 1: port=GPIOB; pin=GPIO_PIN_3; break;
+                        case 2: port=GPIOB; pin=GPIO_PIN_2; break;
+                        case 3: port=GPIOB; pin=GPIO_PIN_1; break;
+                        case 4: port=GPIOB; pin=GPIO_PIN_0; break;
+                        case 5: port=GPIOC; pin=GPIO_PIN_3; break;
+                        case 6: port=GPIOC; pin=GPIO_PIN_4; break;
+                    }
+
+                    if(port)
+                    {
+                        if(state) GPIO_WriteHigh(port, pin);
+                        else      GPIO_WriteLow(port, pin);
+                    }
                 }
-
-                /* Start streaming */
-                else if(rxbuf[0]=='o' && rxbuf[1]=='k')
-                {
-                    send_enable = 1;
-                }
-
-                /* Relay 1 */
-                else if(rxbuf[0]=='R' && rxbuf[1]=='1' && rxbuf[2]==',' && rxbuf[3]=='1')
-                    GPIO_WriteHigh(GPIOB, GPIO_PIN_3);
-
-                else if(rxbuf[0]=='R' && rxbuf[1]=='1' && rxbuf[2]==',' && rxbuf[3]=='0')
-                    GPIO_WriteLow(GPIOB, GPIO_PIN_3);
-
-                /* Relay 2 */
-                else if(rxbuf[0]=='R' && rxbuf[1]=='2' && rxbuf[2]==',' && rxbuf[3]=='1')
-                    GPIO_WriteHigh(GPIOB, GPIO_PIN_2);
-
-                else if(rxbuf[0]=='R' && rxbuf[1]=='2' && rxbuf[2]==',' && rxbuf[3]=='0')
-                    GPIO_WriteLow(GPIOB, GPIO_PIN_2);
-
-                /* Relay 3 */
-                else if(rxbuf[0]=='R' && rxbuf[1]=='3' && rxbuf[2]==',' && rxbuf[3]=='1')
-                    GPIO_WriteHigh(GPIOB, GPIO_PIN_1);
-
-                else if(rxbuf[0]=='R' && rxbuf[1]=='3' && rxbuf[2]==',' && rxbuf[3]=='0')
-                    GPIO_WriteLow(GPIOB, GPIO_PIN_1);
-
-                /* Relay 4 */
-                else if(rxbuf[0]=='R' && rxbuf[1]=='4' && rxbuf[2]==',' && rxbuf[3]=='1')
-                    GPIO_WriteHigh(GPIOB, GPIO_PIN_0);
-
-                else if(rxbuf[0]=='R' && rxbuf[1]=='4' && rxbuf[2]==',' && rxbuf[3]=='0')
-                    GPIO_WriteLow(GPIOB, GPIO_PIN_0);
-
-                /* Relay 5 */
-                else if(rxbuf[0]=='R' && rxbuf[1]=='5' && rxbuf[2]==',' && rxbuf[3]=='1')
-                    GPIO_WriteHigh(GPIOC, GPIO_PIN_3);
-
-                else if(rxbuf[0]=='R' && rxbuf[1]=='5' && rxbuf[2]==',' && rxbuf[3]=='0')
-                    GPIO_WriteLow(GPIOC, GPIO_PIN_3);
-
-                /* Relay 6 */
-                else if(rxbuf[0]=='R' && rxbuf[1]=='6' && rxbuf[2]==',' && rxbuf[3]=='1')
-                    GPIO_WriteHigh(GPIOC, GPIO_PIN_4);
-
-                else if(rxbuf[0]=='R' && rxbuf[1]=='6' && rxbuf[2]==',' && rxbuf[3]=='0')
-                    GPIO_WriteLow(GPIOC, GPIO_PIN_4);
             }
 
-            /* Stream DI status */
-            if(send_enable)
+            /* ================= SMART STREAM ================= */
+            send_timer++;
+
+            curr_state[0]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_2)==RESET)?'1':'0';
+            curr_state[1]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_3)==RESET)?'1':'0';
+            curr_state[2]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_4)==RESET)?'1':'0';
+            curr_state[3]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_7)==RESET)?'1':'0';
+
+            changed =
+                (curr_state[0] != prev_state[0]) ||
+                (curr_state[1] != prev_state[1]) ||
+                (curr_state[2] != prev_state[2]) ||
+                (curr_state[3] != prev_state[3]);
+
+            if(changed || send_timer >= 100)   // ~1 sec
             {
-                txbuf[0] = (GPIO_ReadInputPin(GPIOD, GPIO_PIN_2)==RESET)?'1':'0';
-                txbuf[1] = (GPIO_ReadInputPin(GPIOD, GPIO_PIN_3)==RESET)?'1':'0';
-                txbuf[2] = (GPIO_ReadInputPin(GPIOD, GPIO_PIN_4)==RESET)?'1':'0';
-                txbuf[3] = (GPIO_ReadInputPin(GPIOD, GPIO_PIN_7)==RESET)?'1':'0';
+                send_timer = 0;
 
-                txbuf[4] = '\r';
-                txbuf[5] = '\n';
+                if(getSn_SR(SOCK_TCPS) != SOCK_ESTABLISHED)
+                    break;
 
-                if(send(SOCK_TCPS, txbuf, 6) <= 0)
+                txbuf[0]=curr_state[0];
+                txbuf[1]=curr_state[1];
+                txbuf[2]=curr_state[2];
+                txbuf[3]=curr_state[3];
+                txbuf[4]='\r';
+                txbuf[5]='\n';
+
+                free = getSn_TX_FSR(SOCK_TCPS);
+
+                if(free >= 16)   // ✅ stronger safety
                 {
-                    disconnect(SOCK_TCPS);
-                    close(SOCK_TCPS);
-                    send_enable = 0;
+                    if(send(SOCK_TCPS, txbuf, 6) <= 0)
+                    {
+                        disconnect(SOCK_TCPS);   // ✅ safe recovery
+                        break;
+                    }
+
+                    delay_ms(5);   // ✅ IMPORTANT
                 }
 
-                delay_ms(500);
+                prev_state[0]=curr_state[0];
+                prev_state[1]=curr_state[1];
+                prev_state[2]=curr_state[2];
+                prev_state[3]=curr_state[3];
             }
 
             break;
 
+        /* ================= DISCONNECT ================= */
         case SOCK_CLOSE_WAIT:
-
             disconnect(SOCK_TCPS);
-            close(SOCK_TCPS);
-
-            send_enable = 0;
-
             break;
 
         case SOCK_FIN_WAIT:
         case SOCK_CLOSING:
         case SOCK_TIME_WAIT:
         case SOCK_LAST_ACK:
-
             close(SOCK_TCPS);
+            break;
 
-            send_enable = 0;
-
+        default:
             break;
         }
     }

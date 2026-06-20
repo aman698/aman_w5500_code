@@ -163,7 +163,6 @@ void GPIO_Config(void)
 void main(void)
 {
     uint16_t len;
-    uint16_t free;
     uint8_t txbuf[6];
 
     uint8_t curr_state[4];
@@ -184,54 +183,40 @@ void main(void)
     {
         switch(getSn_SR(SOCK_TCPS))
         {
-
-        /* ================= SOCKET CLOSED ================= */
         case SOCK_CLOSED:
             close(SOCK_TCPS);
             socket(SOCK_TCPS, Sn_MR_TCP, TCP_PORT, 0);
             delay_ms(100);
             break;
 
-        /* ================= LISTEN ================= */
         case SOCK_INIT:
             listen(SOCK_TCPS);
             break;
 
-        /* ================= CONNECTED ================= */
         case SOCK_ESTABLISHED:
 
-            /* ✅ connection event */
+            /* ✅ Connection event */
             if(getSn_IR(SOCK_TCPS) & Sn_IR_CON)
             {
                 setSn_IR(SOCK_TCPS, Sn_IR_CON);
 
-                curr_state[0]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_2)==RESET)?'1':'0';
-                curr_state[1]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_3)==RESET)?'1':'0';
-                curr_state[2]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_4)==RESET)?'1':'0';
-                curr_state[3]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_7)==RESET)?'1':'0';
+                prev_state[0]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_2)==RESET)?'1':'0';
+                prev_state[1]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_3)==RESET)?'1':'0';
+                prev_state[2]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_4)==RESET)?'1':'0';
+                prev_state[3]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_7)==RESET)?'1':'0';
 
-                txbuf[0]=curr_state[0];
-                txbuf[1]=curr_state[1];
-                txbuf[2]=curr_state[2];
-                txbuf[3]=curr_state[3];
+                txbuf[0]=prev_state[0];
+                txbuf[1]=prev_state[1];
+                txbuf[2]=prev_state[2];
+                txbuf[3]=prev_state[3];
                 txbuf[4]='\r';
                 txbuf[5]='\n';
 
-                free = getSn_TX_FSR(SOCK_TCPS);
-
-                if(free >= 16)
-                {
+                if(getSn_TX_FSR(SOCK_TCPS) >= 12)
                     send(SOCK_TCPS, txbuf, 6);
-                    delay_ms(5);   // ✅ buffer flush
-                }
-
-                prev_state[0]=curr_state[0];
-                prev_state[1]=curr_state[1];
-                prev_state[2]=curr_state[2];
-                prev_state[3]=curr_state[3];
             }
 
-            /* ================= RECEIVE ================= */
+            /* ✅ RECEIVE COMMAND */
             len = getSn_RX_RSR(SOCK_TCPS);
 
             if(len >= 4)
@@ -243,50 +228,59 @@ void main(void)
 
                 if(rxbuf[0]=='R' && rxbuf[2]==',')
                 {
-                    uint8_t relay = rxbuf[1]-'0';
-                    uint8_t state = rxbuf[3]-'0';
-
-                    GPIO_TypeDef* port = 0;
-                    uint8_t pin = 0;
-
-                    switch(relay)
+                    switch(rxbuf[1])
                     {
-                        case 1: port=GPIOB; pin=GPIO_PIN_3; break;
-                        case 2: port=GPIOB; pin=GPIO_PIN_2; break;
-                        case 3: port=GPIOB; pin=GPIO_PIN_1; break;
-                        case 4: port=GPIOB; pin=GPIO_PIN_0; break;
-                        case 5: port=GPIOC; pin=GPIO_PIN_3; break;
-                        case 6: port=GPIOC; pin=GPIO_PIN_4; break;
-                    }
+                        case '1':
+                            if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOB,GPIO_PIN_3);
+                            else GPIO_WriteLow(GPIOB,GPIO_PIN_3);
+                            break;
 
-                    if(port)
-                    {
-                        if(state) GPIO_WriteHigh(port, pin);
-                        else      GPIO_WriteLow(port, pin);
+                        case '2':
+                            if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOB,GPIO_PIN_2);
+                            else GPIO_WriteLow(GPIOB,GPIO_PIN_2);
+                            break;
+
+                        case '3':
+                            if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOB,GPIO_PIN_1);
+                            else GPIO_WriteLow(GPIOB,GPIO_PIN_1);
+                            break;
+
+                        case '4':
+                            if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOB,GPIO_PIN_0);
+                            else GPIO_WriteLow(GPIOB,GPIO_PIN_0);
+                            break;
+
+                        case '5':
+                            if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOC,GPIO_PIN_3);
+                            else GPIO_WriteLow(GPIOC,GPIO_PIN_3);
+                            break;
+
+                        case '6':
+                            if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOC,GPIO_PIN_4);
+                            else GPIO_WriteLow(GPIOC,GPIO_PIN_4);
+                            break;
                     }
                 }
             }
 
-            /* ================= SMART STREAM ================= */
-            send_timer++;
-
+            /* ✅ READ INPUT */
             curr_state[0]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_2)==RESET)?'1':'0';
             curr_state[1]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_3)==RESET)?'1':'0';
             curr_state[2]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_4)==RESET)?'1':'0';
             curr_state[3]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_7)==RESET)?'1':'0';
 
             changed =
-                (curr_state[0] != prev_state[0]) ||
-                (curr_state[1] != prev_state[1]) ||
-                (curr_state[2] != prev_state[2]) ||
-                (curr_state[3] != prev_state[3]);
+                (curr_state[0]!=prev_state[0]) ||
+                (curr_state[1]!=prev_state[1]) ||
+                (curr_state[2]!=prev_state[2]) ||
+                (curr_state[3]!=prev_state[3]);
 
-            if(changed || send_timer >= 100)   // ~1 sec
+            /* ✅ TIMER FOR 300ms STREAM */
+            send_timer++;
+
+            if(send_timer >= 30)   // ~300ms (10ms loop delay below)
             {
                 send_timer = 0;
-
-                if(getSn_SR(SOCK_TCPS) != SOCK_ESTABLISHED)
-                    break;
 
                 txbuf[0]=curr_state[0];
                 txbuf[1]=curr_state[1];
@@ -295,17 +289,29 @@ void main(void)
                 txbuf[4]='\r';
                 txbuf[5]='\n';
 
-                free = getSn_TX_FSR(SOCK_TCPS);
-
-                if(free >= 16)   // ✅ stronger safety
+                if(getSn_TX_FSR(SOCK_TCPS) >= 12)
                 {
                     if(send(SOCK_TCPS, txbuf, 6) <= 0)
                     {
-                        disconnect(SOCK_TCPS);   // ✅ safe recovery
+                        disconnect(SOCK_TCPS);
                         break;
                     }
+                }
+            }
 
-                    delay_ms(5);   // ✅ IMPORTANT
+            /* ✅ TRIGGER (instant send) */
+            if(changed)
+            {
+                txbuf[0]=curr_state[0];
+                txbuf[1]=curr_state[1];
+                txbuf[2]=curr_state[2];
+                txbuf[3]=curr_state[3];
+                txbuf[4]='\r';
+                txbuf[5]='\n';
+
+                if(getSn_TX_FSR(SOCK_TCPS) >= 12)
+                {
+                    send(SOCK_TCPS, txbuf, 6);
                 }
 
                 prev_state[0]=curr_state[0];
@@ -314,9 +320,10 @@ void main(void)
                 prev_state[3]=curr_state[3];
             }
 
+            delay_ms(10);   // ✅ keeps loop stable
+
             break;
 
-        /* ================= DISCONNECT ================= */
         case SOCK_CLOSE_WAIT:
             disconnect(SOCK_TCPS);
             break;

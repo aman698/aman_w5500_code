@@ -1,5 +1,5 @@
 
-Map of Debug\aman-w5500.sm8 from link file Debug\aman-w5500.lkf - Sat Jun 20 13:58:52 2026
+Map of Debug\aman-w5500.sm8 from link file Debug\aman-w5500.lkf - Sat Jun 20 14:20:24 2026
 
 
                                --------
@@ -7,7 +7,7 @@ Map of Debug\aman-w5500.sm8 from link file Debug\aman-w5500.lkf - Sat Jun 20 13:
                                --------
 
 start 00008080 end 000080b4 length    52 segment .const
-start 0000811a end 00009f35 length  7707 segment .text
+start 0000811a end 00009f76 length  7772 segment .text
 start 00004000 end 00004000 length     0 segment .eeprom
 start 00000000 end 0000005e length    94 segment .bsct, initialized
 start 000080bc end 0000811a length    94 segment .bsct, from
@@ -17,7 +17,7 @@ start 0000008d end 0000008d length     0 segment .share
 start 00000100 end 00000100 length     0 segment .data
 start 00000100 end 00000100 length     0 segment .bss
 start 00000000 end 000006c5 length  1733 segment .info.
-start 00000000 end 000045e5 length 17893 segment .debug
+start 00000000 end 000044c4 length 17604 segment .debug
 start 00008000 end 00008080 length   128 segment .const
 start 000080b4 end 000080bc length     8 segment .init
 
@@ -49,38 +49,38 @@ start 00000e90 end 0000173d length  2221 section .debug
 start 00000110 end 0000017e length   110 section .info.
 
 Debug\main.o:
-start 00008358 end 000087d7 length  1151 section .text
+start 00008358 end 00008818 length  1216 section .text
 start 00000000 end 00000028 length    40 section .bsct
 start 0000005e end 0000007e length    32 section .ubsct
-start 0000173d end 00001e0e length  1745 section .debug
+start 0000173d end 00001ced length  1456 section .debug
 start 0000017e end 000001e7 length   105 section .info.
 start 0000808c end 00008090 length     4 section .const
 
 Debug\socket.o:
-start 000087d7 end 00008f9a length  1987 section .text
+start 00008818 end 00008fdb length  1987 section .text
 start 00000028 end 00000046 length    30 section .bsct
-start 00001e0e end 00002288 length  1146 section .debug
+start 00001ced end 00002167 length  1146 section .debug
 start 000001e7 end 00000252 length   107 section .info.
 
 Debug\w5500.o:
-start 00008f9a end 000094a7 length  1293 section .text
-start 00002288 end 0000291b length  1683 section .debug
+start 00008fdb end 000094e8 length  1293 section .text
+start 00002167 end 000027fa length  1683 section .debug
 start 00000252 end 000002bc length   106 section .info.
 
 Debug\wizchip_conf.o:
-start 000094a7 end 00009d1a length  2163 section .text
+start 000094e8 end 00009d5b length  2163 section .text
 start 00000046 end 0000005e length    24 section .bsct
 start 0000007e end 00000083 length     5 section .ubsct
-start 0000291b end 0000447a length  7007 section .debug
+start 000027fa end 00004359 length  7007 section .debug
 start 000002bc end 0000032d length   113 section .info.
 start 00008090 end 000080b4 length    36 section .const
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)itolx.o:
-start 00009d1a end 00009d28 length    14 section .text
+start 00009d5b end 00009d69 length    14 section .text
 start 0000032d end 0000035c length    47 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ladd.o:
-start 00009d28 end 00009d40 length    24 section .text
+start 00009d69 end 00009d81 length    24 section .text
 start 0000035c end 0000038a length    46 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lreg.o:
@@ -88,43 +88,43 @@ start 00000083 end 00000087 length     4 section .ubsct
 start 0000038a end 000003b8 length    46 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lrzmp.o:
-start 00009d40 end 00009d54 length    20 section .text
+start 00009d81 end 00009d95 length    20 section .text
 start 000003b8 end 000003e7 length    47 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ltor.o:
-start 00009d54 end 00009d66 length    18 section .text
+start 00009d95 end 00009da7 length    18 section .text
 start 000003e7 end 00000415 length    46 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ludiv.o:
-start 00009d66 end 00009d7a length    20 section .text
+start 00009da7 end 00009dbb length    20 section .text
 start 00000415 end 00000444 length    47 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ldiv.o:
-start 00009d7a end 00009e65 length   235 section .text
+start 00009dbb end 00009ea6 length   235 section .text
 start 00000444 end 00000472 length    46 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lgneg.o:
-start 00009e65 end 00009e78 length    19 section .text
+start 00009ea6 end 00009eb9 length    19 section .text
 start 00000472 end 000004a1 length    47 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lneg.o:
-start 00009e78 end 00009e8d length    21 section .text
+start 00009eb9 end 00009ece length    21 section .text
 start 000004a1 end 000004cf length    46 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lzmp.o:
-start 00009e8d end 00009ea0 length    19 section .text
+start 00009ece end 00009ee1 length    19 section .text
 start 000004cf end 000004fd length    46 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)rtol.o:
-start 00009ea0 end 00009eb2 length    18 section .text
+start 00009ee1 end 00009ef3 length    18 section .text
 start 000004fd end 0000052b length    46 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)utolx.o:
-start 00009eb2 end 00009eb9 length     7 section .text
+start 00009ef3 end 00009efa length     7 section .text
 start 0000052b end 0000055a length    47 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)umul.o:
-start 00009eb9 end 00009ef5 length    60 section .text
+start 00009efa end 00009f36 length    60 section .text
 start 0000055a end 00000588 length    46 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)xreg.o:
@@ -132,7 +132,7 @@ start 00000087 end 0000008a length     3 section .ubsct
 start 00000588 end 000005b6 length    46 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)xymov.o:
-start 00009ef5 end 00009f34 length    63 section .text
+start 00009f36 end 00009f75 length    63 section .text
 start 000005b6 end 000005e5 length    47 section .info.
 
 (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)yreg.o:
@@ -140,8 +140,8 @@ start 0000008a end 0000008d length     3 section .ubsct
 start 000005e5 end 00000613 length    46 section .info.
 
 Debug\stm8_interrupt_vector.o:
-start 00009f34 end 00009f35 length     1 section .text
-start 0000447a end 000045e5 length   363 section .debug
+start 00009f75 end 00009f76 length     1 section .text
+start 00004359 end 000044c4 length   363 section .debug
 start 00000613 end 0000068d length   122 section .info.
 start 00008000 end 00008080 length   128 section .const
 
@@ -156,7 +156,7 @@ _SPI_Config                       13   (2)
 _W5500_Init                       52   (2)
 _W5500_Reset                      10   (2)
 _delay_ms                          8   (8)
-_main                         >   75   (23)
+_main                         >   73   (21)
 _spi_readbyte                      5   (2)
 _spi_writebyte                     5   (2)
 _wizchip_deselect                  7   (2)
@@ -242,7 +242,7 @@ _wizphy_reset                     21   (3)
 _wizphy_setphyconf                26   (5)
 _wizphy_setphypmode               25   (4)
 
-Stack size: 81
+Stack size: 79
 
 
                               ---------
@@ -385,7 +385,7 @@ Stack size: 81
  109      |    + _wizphy_reset --> 100
           | 
        
- 110 > _main: (23)
+ 110 > _main: (21)
  111      + _CLK_HSIPrescalerConfig: (3)
  112      + _GPIO_Config: (2)
  113      |    + _GPIO_Init: (6)
@@ -654,16 +654,16 @@ _W5500_Init                    00008430   defined in Debug\main.o section .text
 _W5500_Reset                   00008406   defined in Debug\main.o section .text
 _WIZCHIP                       00000046   defined in Debug\wizchip_conf.o section .bsct, initialized
                                           used in Debug\w5500.o
-_WIZCHIP_READ                  00008f9a   defined in Debug\w5500.o section .text
+_WIZCHIP_READ                  00008fdb   defined in Debug\w5500.o section .text
                                           used in Debug\main.o Debug\socket.o
                                                   Debug\wizchip_conf.o
-_WIZCHIP_READ_BUF              00009048   defined in Debug\w5500.o section .text
+_WIZCHIP_READ_BUF              00009089   defined in Debug\w5500.o section .text
                                           used in Debug\socket.o
                                                   Debug\wizchip_conf.o
-_WIZCHIP_WRITE                 00008fef   defined in Debug\w5500.o section .text
+_WIZCHIP_WRITE                 00009030   defined in Debug\w5500.o section .text
                                           used in Debug\main.o Debug\socket.o
                                                   Debug\wizchip_conf.o
-_WIZCHIP_WRITE_BUF             000090ba   defined in Debug\w5500.o section .text
+_WIZCHIP_WRITE_BUF             000090fb   defined in Debug\w5500.o section .text
                                           used in Debug\wizchip_conf.o
 __endmem                       000001ff   defined in command file
                                           *** not used ***
@@ -681,92 +681,92 @@ __stext                        0000811a   defined in C:\Program Files (x86)\COSM
                                           used in Debug\stm8_interrupt_vector.o
 __vectab                       00008000   defined in Debug\stm8_interrupt_vector.o section .const
 _changed                       00000010   defined in Debug\main.o section .bsct, initialized
-_close                         00008985   defined in Debug\socket.o section .text
+_close                         000089c6   defined in Debug\socket.o section .text
                                           used in Debug\main.o
-_ctlnetwork                    000096a3   defined in Debug\wizchip_conf.o section .text
-_ctlwizchip                    00009569   defined in Debug\wizchip_conf.o section .text
+_ctlnetwork                    000096e4   defined in Debug\wizchip_conf.o section .text
+_ctlwizchip                    000095aa   defined in Debug\wizchip_conf.o section .text
 _delay_ms                      00008358   defined in Debug\main.o section .text
-_disconnect                    00008aff   defined in Debug\socket.o section .text
+_disconnect                    00008b40   defined in Debug\socket.o section .text
                                           used in Debug\main.o
 _exit                          00008168   defined in C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\crtsi0.sm8 section .text
-_getSn_RX_RSR                  000091d6   defined in Debug\w5500.o section .text
+_getSn_RX_RSR                  00009217   defined in Debug\w5500.o section .text
                                           used in Debug\main.o Debug\socket.o
-_getSn_TX_FSR                  0000912e   defined in Debug\w5500.o section .text
+_getSn_TX_FSR                  0000916f   defined in Debug\w5500.o section .text
                                           used in Debug\main.o Debug\socket.o
-_listen                        00008a43   defined in Debug\socket.o section .text
+_listen                        00008a84   defined in Debug\socket.o section .text
                                           used in Debug\main.o
 _main                          000084c7   defined in Debug\main.o section .text
                                           used in C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\crtsi0.sm8
 _netinfo                       00000011   defined in Debug\main.o section .bsct, initialized
-_recv                          00008e0b   defined in Debug\socket.o section .text
+_recv                          00008e4c   defined in Debug\socket.o section .text
                                           used in Debug\main.o
-_reg_wizchip_bus_cbfunc        000094fa   defined in Debug\wizchip_conf.o section .text
-_reg_wizchip_cris_cbfunc       000094ba   defined in Debug\wizchip_conf.o section .text
-_reg_wizchip_cs_cbfunc         000094da   defined in Debug\wizchip_conf.o section .text
+_reg_wizchip_bus_cbfunc        0000953b   defined in Debug\wizchip_conf.o section .text
+_reg_wizchip_cris_cbfunc       000094fb   defined in Debug\wizchip_conf.o section .text
+_reg_wizchip_cs_cbfunc         0000951b   defined in Debug\wizchip_conf.o section .text
                                           used in Debug\main.o
-_reg_wizchip_spi_cbfunc        0000951f   defined in Debug\wizchip_conf.o section .text
+_reg_wizchip_spi_cbfunc        00009560   defined in Debug\wizchip_conf.o section .text
                                           used in Debug\main.o
-_reg_wizchip_spiburst_cbfunc   00009544   defined in Debug\wizchip_conf.o section .text
+_reg_wizchip_spiburst_cbfunc   00009585   defined in Debug\wizchip_conf.o section .text
 _rxbuf                         0000005e   defined in Debug\main.o section .ubsct
 _rxsize                        00000008   defined in Debug\main.o section .bsct, initialized
-_send                          00008be7   defined in Debug\socket.o section .text
+_send                          00008c28   defined in Debug\socket.o section .text
                                           used in Debug\main.o
 _sock_pack_info                0000003e   defined in Debug\socket.o section .bsct, initialized
-_socket                        000087d7   defined in Debug\socket.o section .text
+_socket                        00008818   defined in Debug\socket.o section .text
                                           used in Debug\main.o
 _spi_readbyte                  000083ac   defined in Debug\main.o section .text
 _spi_writebyte                 00008395   defined in Debug\main.o section .text
 _txsize                        00000000   defined in Debug\main.o section .bsct, initialized
-_wiz_recv_data                 0000934e   defined in Debug\w5500.o section .text
+_wiz_recv_data                 0000938f   defined in Debug\w5500.o section .text
                                           used in Debug\socket.o
-_wiz_recv_ignore               0000941e   defined in Debug\w5500.o section .text
-_wiz_send_data                 0000927e   defined in Debug\w5500.o section .text
+_wiz_recv_ignore               0000945f   defined in Debug\w5500.o section .text
+_wiz_send_data                 000092bf   defined in Debug\w5500.o section .text
                                           used in Debug\socket.o
-_wizchip_bus_readdata          000094ab   defined in Debug\wizchip_conf.o section .text
-_wizchip_bus_writedata         000094af   defined in Debug\wizchip_conf.o section .text
-_wizchip_clrinterrupt          00009888   defined in Debug\wizchip_conf.o section .text
-_wizchip_cris_enter            000094a7   defined in Debug\wizchip_conf.o section .text
-_wizchip_cris_exit             000094a8   defined in Debug\wizchip_conf.o section .text
-_wizchip_cs_deselect           000094aa   defined in Debug\wizchip_conf.o section .text
-_wizchip_cs_select             000094a9   defined in Debug\wizchip_conf.o section .text
+_wizchip_bus_readdata          000094ec   defined in Debug\wizchip_conf.o section .text
+_wizchip_bus_writedata         000094f0   defined in Debug\wizchip_conf.o section .text
+_wizchip_clrinterrupt          000098c9   defined in Debug\wizchip_conf.o section .text
+_wizchip_cris_enter            000094e8   defined in Debug\wizchip_conf.o section .text
+_wizchip_cris_exit             000094e9   defined in Debug\wizchip_conf.o section .text
+_wizchip_cs_deselect           000094eb   defined in Debug\wizchip_conf.o section .text
+_wizchip_cs_select             000094ea   defined in Debug\wizchip_conf.o section .text
 _wizchip_deselect              0000838b   defined in Debug\main.o section .text
-_wizchip_getinterrupt          000098b5   defined in Debug\wizchip_conf.o section .text
-_wizchip_getinterruptmask      0000991b   defined in Debug\wizchip_conf.o section .text
-_wizchip_getnetinfo            00009bdb   defined in Debug\wizchip_conf.o section .text
-_wizchip_getnetmode            00009c91   defined in Debug\wizchip_conf.o section .text
-_wizchip_gettimeout            00009cd8   defined in Debug\wizchip_conf.o section .text
-_wizchip_init                  000097bb   defined in Debug\wizchip_conf.o section .text
+_wizchip_getinterrupt          000098f6   defined in Debug\wizchip_conf.o section .text
+_wizchip_getinterruptmask      0000995c   defined in Debug\wizchip_conf.o section .text
+_wizchip_getnetinfo            00009c1c   defined in Debug\wizchip_conf.o section .text
+_wizchip_getnetmode            00009cd2   defined in Debug\wizchip_conf.o section .text
+_wizchip_gettimeout            00009d19   defined in Debug\wizchip_conf.o section .text
+_wizchip_init                  000097fc   defined in Debug\wizchip_conf.o section .text
                                           used in Debug\main.o
 _wizchip_select                00008381   defined in Debug\main.o section .text
-_wizchip_setinterruptmask      000098f0   defined in Debug\wizchip_conf.o section .text
-_wizchip_setnetinfo            00009b61   defined in Debug\wizchip_conf.o section .text
+_wizchip_setinterruptmask      00009931   defined in Debug\wizchip_conf.o section .text
+_wizchip_setnetinfo            00009ba2   defined in Debug\wizchip_conf.o section .text
                                           used in Debug\main.o
-_wizchip_setnetmode            00009c55   defined in Debug\wizchip_conf.o section .text
-_wizchip_settimeout            00009c9f   defined in Debug\wizchip_conf.o section .text
-_wizchip_spi_readburst         000094b8   defined in Debug\wizchip_conf.o section .text
-_wizchip_spi_readbyte          000094b5   defined in Debug\wizchip_conf.o section .text
-_wizchip_spi_writeburst        000094b9   defined in Debug\wizchip_conf.o section .text
-_wizchip_spi_writebyte         000094b7   defined in Debug\wizchip_conf.o section .text
-_wizchip_sw_reset              000096ea   defined in Debug\wizchip_conf.o section .text
-_wizphy_getphyconf             00009a4a   defined in Debug\wizchip_conf.o section .text
-_wizphy_getphylink             00009954   defined in Debug\wizchip_conf.o section .text
-_wizphy_getphypmode            00009973   defined in Debug\wizchip_conf.o section .text
-_wizphy_getphystat             00009abc   defined in Debug\wizchip_conf.o section .text
-_wizphy_reset                  00009992   defined in Debug\wizchip_conf.o section .text
-_wizphy_setphyconf             000099df   defined in Debug\wizchip_conf.o section .text
-_wizphy_setphypmode            00009aee   defined in Debug\wizchip_conf.o section .text
-c_divsl                        00009d7a   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ldiv.o section .text
+_wizchip_setnetmode            00009c96   defined in Debug\wizchip_conf.o section .text
+_wizchip_settimeout            00009ce0   defined in Debug\wizchip_conf.o section .text
+_wizchip_spi_readburst         000094f9   defined in Debug\wizchip_conf.o section .text
+_wizchip_spi_readbyte          000094f6   defined in Debug\wizchip_conf.o section .text
+_wizchip_spi_writeburst        000094fa   defined in Debug\wizchip_conf.o section .text
+_wizchip_spi_writebyte         000094f8   defined in Debug\wizchip_conf.o section .text
+_wizchip_sw_reset              0000972b   defined in Debug\wizchip_conf.o section .text
+_wizphy_getphyconf             00009a8b   defined in Debug\wizchip_conf.o section .text
+_wizphy_getphylink             00009995   defined in Debug\wizchip_conf.o section .text
+_wizphy_getphypmode            000099b4   defined in Debug\wizchip_conf.o section .text
+_wizphy_getphystat             00009afd   defined in Debug\wizchip_conf.o section .text
+_wizphy_reset                  000099d3   defined in Debug\wizchip_conf.o section .text
+_wizphy_setphyconf             00009a20   defined in Debug\wizchip_conf.o section .text
+_wizphy_setphypmode            00009b2f   defined in Debug\wizchip_conf.o section .text
+c_divsl                        00009dbb   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ldiv.o section .text
                                           *** not used ***
-c_divul                        00009d91   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ldiv.o section .text
+c_divul                        00009dd2   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ldiv.o section .text
                                           used in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ludiv.o
-c_itolx                        00009d1a   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)itolx.o section .text
+c_itolx                        00009d5b   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)itolx.o section .text
                                           used in Debug\socket.o Debug\w5500.o
                                                   Debug\wizchip_conf.o
-c_ladd                         00009d28   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ladd.o section .text
+c_ladd                         00009d69   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ladd.o section .text
                                           used in Debug\w5500.o
-c_lgneg                        00009e65   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lgneg.o section .text
+c_lgneg                        00009ea6   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lgneg.o section .text
                                           used in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ldiv.o
-c_lneg                         00009e78   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lneg.o section .text
+c_lneg                         00009eb9   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lneg.o section .text
                                           used in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ldiv.o
 c_lreg                         00000083   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lreg.o section .ubsct
                                           used in Debug\stm8s_clk.o
@@ -781,29 +781,29 @@ c_lreg                         00000083   defined in (C:\Program Files (x86)\COS
                                                   (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)rtol.o
                                                   (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)utolx.o
                                                   (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)umul.o
-c_lrzmp                        00009d40   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lrzmp.o section .text
+c_lrzmp                        00009d81   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lrzmp.o section .text
                                           used in Debug\main.o
-c_ltor                         00009d54   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ltor.o section .text
+c_ltor                         00009d95   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ltor.o section .text
                                           used in Debug\stm8s_clk.o
-c_ludv                         00009d66   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ludiv.o section .text
+c_ludv                         00009da7   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ludiv.o section .text
                                           used in Debug\stm8s_clk.o
-c_lzmp                         00009e8d   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lzmp.o section .text
+c_lzmp                         00009ece   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)lzmp.o section .text
                                           used in Debug\socket.o
-c_rtol                         00009ea0   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)rtol.o section .text
+c_rtol                         00009ee1   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)rtol.o section .text
                                           used in Debug\stm8s_clk.o Debug\w5500.o
-c_uitolx                       00009eb2   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)utolx.o section .text
+c_uitolx                       00009ef3   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)utolx.o section .text
                                           used in Debug\socket.o
-c_umul                         00009eb9   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)umul.o section .text
+c_umul                         00009efa   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)umul.o section .text
                                           used in Debug\w5500.o
 c_x                            00000087   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)xreg.o section .ubsct
                                           used in C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\crtsi0.sm8
                                                   (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)ldiv.o
                                                   (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)umul.o
                                                   (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)xymov.o
-c_xymov                        00009ef5   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)xymov.o section .text
+c_xymov                        00009f36   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)xymov.o section .text
                                           used in Debug\main.o
                                                   Debug\wizchip_conf.o
 c_y                            0000008a   defined in (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)yreg.o section .ubsct
                                           used in C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\crtsi0.sm8
                                                   (C:\Program Files (x86)\COSMIC\FSE_Compilers\CXSTM8\lib\libm0.sm8)umul.o
-f_NonHandledInterrupt          00009f34   defined in Debug\stm8_interrupt_vector.o section .text
+f_NonHandledInterrupt          00009f75   defined in Debug\stm8_interrupt_vector.o section .text

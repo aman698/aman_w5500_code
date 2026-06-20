@@ -322,582 +322,616 @@
  724  0001 30            	dc.b	48
  725  0002 30            	dc.b	48
  726  0003 30            	dc.b	48
- 926                     ; 163 void main(void)
- 926                     ; 164 {
- 927                     	switch	.text
- 928  016f               _main:
- 930  016f 5215          	subw	sp,#21
- 931       00000015      OFST:	set	21
- 934                     ; 170     uint8_t prev_state[4] = {'0','0','0','0'};
- 936  0171 96            	ldw	x,sp
- 937  0172 1c0006        	addw	x,#OFST-15
- 938  0175 90ae0000      	ldw	y,#L502_prev_state
- 939  0179 a604          	ld	a,#4
- 940  017b cd0000        	call	c_xymov
- 942                     ; 173     uint16_t send_timer = 0;
- 944  017e 5f            	clrw	x
- 945  017f 1f03          	ldw	(OFST-18,sp),x
- 947                     ; 175     CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
- 949  0181 4f            	clr	a
- 950  0182 cd0000        	call	_CLK_HSIPrescalerConfig
- 952                     ; 177     SPI_Config();
- 954  0185 cd0065        	call	_SPI_Config
- 956                     ; 178     GPIO_Config();
- 958  0188 cd0100        	call	_GPIO_Config
- 960                     ; 180     W5500_Reset();
- 962  018b cd00ae        	call	_W5500_Reset
- 964                     ; 181     W5500_Init();
- 966  018e cd00d8        	call	_W5500_Init
- 968  0191               L753:
- 969                     ; 185         switch(getSn_SR(SOCK_TCPS))
- 971  0191 ae0308        	ldw	x,#776
- 972  0194 89            	pushw	x
- 973  0195 ae0000        	ldw	x,#0
- 974  0198 89            	pushw	x
- 975  0199 cd0000        	call	_WIZCHIP_READ
- 977  019c 5b04          	addw	sp,#4
- 979                     ; 331         default:
- 979                     ; 332             break;
- 980  019e 4d            	tnz	a
- 981  019f 2729          	jreq	L702
- 982  01a1 a013          	sub	a,#19
- 983  01a3 273f          	jreq	L112
- 984  01a5 a004          	sub	a,#4
- 985  01a7 2741          	jreq	L312
- 986  01a9 4a            	dec	a
- 987  01aa 2603          	jrne	L67
- 988  01ac cc046f        	jp	L332
- 989  01af               L67:
- 990  01af a002          	sub	a,#2
- 991  01b1 2603          	jrne	L001
- 992  01b3 cc046f        	jp	L332
- 993  01b6               L001:
- 994  01b6 4a            	dec	a
- 995  01b7 2603          	jrne	L201
- 996  01b9 cc046f        	jp	L332
- 997  01bc               L201:
- 998  01bc 4a            	dec	a
- 999  01bd 2603          	jrne	L401
-1000  01bf cc0467        	jp	L132
-1001  01c2               L401:
-1002  01c2 4a            	dec	a
-1003  01c3 2603          	jrne	L601
-1004  01c5 cc046f        	jp	L332
-1005  01c8               L601:
-1006  01c8 20c7          	jra	L753
-1007  01ca               L702:
-1008                     ; 189         case SOCK_CLOSED:
-1008                     ; 190             close(SOCK_TCPS);
-1010  01ca 4f            	clr	a
-1011  01cb cd0000        	call	_close
-1013                     ; 191             socket(SOCK_TCPS, Sn_MR_TCP, TCP_PORT, 0);
-1015  01ce 4b00          	push	#0
-1016  01d0 ae1388        	ldw	x,#5000
-1017  01d3 89            	pushw	x
-1018  01d4 ae0001        	ldw	x,#1
-1019  01d7 cd0000        	call	_socket
-1021  01da 5b03          	addw	sp,#3
-1022                     ; 192             delay_ms(100);
-1024  01dc ae0064        	ldw	x,#100
-1025  01df cd0000        	call	_delay_ms
-1027                     ; 193             break;
-1029  01e2 20ad          	jra	L753
-1030  01e4               L112:
-1031                     ; 196         case SOCK_INIT:
-1031                     ; 197             listen(SOCK_TCPS);
-1033  01e4 4f            	clr	a
-1034  01e5 cd0000        	call	_listen
-1036                     ; 198             break;
-1038  01e8 20a7          	jra	L753
-1039  01ea               L312:
-1040                     ; 201         case SOCK_ESTABLISHED:
-1040                     ; 202 
-1040                     ; 203             /* ✅ connection event */
-1040                     ; 204             if(getSn_IR(SOCK_TCPS) & Sn_IR_CON)
-1042  01ea ae0208        	ldw	x,#520
-1043  01ed 89            	pushw	x
-1044  01ee ae0000        	ldw	x,#0
-1045  01f1 89            	pushw	x
-1046  01f2 cd0000        	call	_WIZCHIP_READ
-1048  01f5 5b04          	addw	sp,#4
-1049  01f7 a41f          	and	a,#31
-1050  01f9 a501          	bcp	a,#1
-1051  01fb 2603          	jrne	L011
-1052  01fd cc02ad        	jp	L763
-1053  0200               L011:
-1054                     ; 206                 setSn_IR(SOCK_TCPS, Sn_IR_CON);
-1056  0200 4b01          	push	#1
-1057  0202 ae0208        	ldw	x,#520
-1058  0205 89            	pushw	x
-1059  0206 ae0000        	ldw	x,#0
-1060  0209 89            	pushw	x
-1061  020a cd0000        	call	_WIZCHIP_WRITE
-1063  020d 5b05          	addw	sp,#5
-1064                     ; 208                 curr_state[0]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_2)==RESET)?'1':'0';
-1066  020f 4b04          	push	#4
-1067  0211 ae500f        	ldw	x,#20495
-1068  0214 cd0000        	call	_GPIO_ReadInputPin
-1070  0217 5b01          	addw	sp,#1
-1071  0219 4d            	tnz	a
-1072  021a 2604          	jrne	L03
-1073  021c a631          	ld	a,#49
-1074  021e 2002          	jra	L23
-1075  0220               L03:
-1076  0220 a630          	ld	a,#48
-1077  0222               L23:
-1078  0222 6b12          	ld	(OFST-3,sp),a
-1080                     ; 209                 curr_state[1]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_3)==RESET)?'1':'0';
-1082  0224 4b08          	push	#8
-1083  0226 ae500f        	ldw	x,#20495
-1084  0229 cd0000        	call	_GPIO_ReadInputPin
-1086  022c 5b01          	addw	sp,#1
-1087  022e 4d            	tnz	a
-1088  022f 2604          	jrne	L43
-1089  0231 a631          	ld	a,#49
-1090  0233 2002          	jra	L63
-1091  0235               L43:
-1092  0235 a630          	ld	a,#48
-1093  0237               L63:
-1094  0237 6b13          	ld	(OFST-2,sp),a
-1096                     ; 210                 curr_state[2]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_4)==RESET)?'1':'0';
-1098  0239 4b10          	push	#16
-1099  023b ae500f        	ldw	x,#20495
-1100  023e cd0000        	call	_GPIO_ReadInputPin
-1102  0241 5b01          	addw	sp,#1
-1103  0243 4d            	tnz	a
-1104  0244 2604          	jrne	L04
-1105  0246 a631          	ld	a,#49
-1106  0248 2002          	jra	L24
-1107  024a               L04:
-1108  024a a630          	ld	a,#48
-1109  024c               L24:
-1110  024c 6b14          	ld	(OFST-1,sp),a
-1112                     ; 211                 curr_state[3]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_7)==RESET)?'1':'0';
-1114  024e 4b80          	push	#128
-1115  0250 ae500f        	ldw	x,#20495
-1116  0253 cd0000        	call	_GPIO_ReadInputPin
-1118  0256 5b01          	addw	sp,#1
-1119  0258 4d            	tnz	a
-1120  0259 2604          	jrne	L44
-1121  025b a631          	ld	a,#49
-1122  025d 2002          	jra	L64
-1123  025f               L44:
-1124  025f a630          	ld	a,#48
-1125  0261               L64:
-1126  0261 6b15          	ld	(OFST+0,sp),a
-1128                     ; 213                 txbuf[0]=curr_state[0];
-1130  0263 7b12          	ld	a,(OFST-3,sp)
-1131  0265 6b0a          	ld	(OFST-11,sp),a
-1133                     ; 214                 txbuf[1]=curr_state[1];
-1135  0267 7b13          	ld	a,(OFST-2,sp)
-1136  0269 6b0b          	ld	(OFST-10,sp),a
-1138                     ; 215                 txbuf[2]=curr_state[2];
-1140  026b 7b14          	ld	a,(OFST-1,sp)
-1141  026d 6b0c          	ld	(OFST-9,sp),a
-1143                     ; 216                 txbuf[3]=curr_state[3];
-1145  026f 7b15          	ld	a,(OFST+0,sp)
-1146  0271 6b0d          	ld	(OFST-8,sp),a
-1148                     ; 217                 txbuf[4]='\r';
-1150  0273 a60d          	ld	a,#13
-1151  0275 6b0e          	ld	(OFST-7,sp),a
-1153                     ; 218                 txbuf[5]='\n';
-1155  0277 a60a          	ld	a,#10
-1156  0279 6b0f          	ld	(OFST-6,sp),a
-1158                     ; 220                 free = getSn_TX_FSR(SOCK_TCPS);
-1160  027b 4f            	clr	a
-1161  027c cd0000        	call	_getSn_TX_FSR
-1163  027f 1f10          	ldw	(OFST-5,sp),x
-1165                     ; 222                 if(free >= 16)
-1167  0281 1e10          	ldw	x,(OFST-5,sp)
-1168  0283 a30010        	cpw	x,#16
-1169  0286 2515          	jrult	L173
-1170                     ; 224                     send(SOCK_TCPS, txbuf, 6);
-1172  0288 ae0006        	ldw	x,#6
-1173  028b 89            	pushw	x
-1174  028c 96            	ldw	x,sp
-1175  028d 1c000c        	addw	x,#OFST-9
-1176  0290 89            	pushw	x
-1177  0291 4f            	clr	a
-1178  0292 cd0000        	call	_send
-1180  0295 5b04          	addw	sp,#4
-1181                     ; 225                     delay_ms(5);   // ✅ buffer flush
-1183  0297 ae0005        	ldw	x,#5
-1184  029a cd0000        	call	_delay_ms
-1186  029d               L173:
-1187                     ; 228                 prev_state[0]=curr_state[0];
-1189  029d 7b12          	ld	a,(OFST-3,sp)
-1190  029f 6b06          	ld	(OFST-15,sp),a
-1192                     ; 229                 prev_state[1]=curr_state[1];
-1194  02a1 7b13          	ld	a,(OFST-2,sp)
-1195  02a3 6b07          	ld	(OFST-14,sp),a
-1197                     ; 230                 prev_state[2]=curr_state[2];
-1199  02a5 7b14          	ld	a,(OFST-1,sp)
-1200  02a7 6b08          	ld	(OFST-13,sp),a
-1202                     ; 231                 prev_state[3]=curr_state[3];
-1204  02a9 7b15          	ld	a,(OFST+0,sp)
-1205  02ab 6b09          	ld	(OFST-12,sp),a
-1207  02ad               L763:
-1208                     ; 235             len = getSn_RX_RSR(SOCK_TCPS);
-1210  02ad 4f            	clr	a
-1211  02ae cd0000        	call	_getSn_RX_RSR
-1213  02b1 1f10          	ldw	(OFST-5,sp),x
-1215                     ; 237             if(len >= 4)
-1217  02b3 1e10          	ldw	x,(OFST-5,sp)
-1218  02b5 a30004        	cpw	x,#4
-1219  02b8 2403          	jruge	L211
-1220  02ba cc036b        	jp	L373
-1221  02bd               L211:
-1222                     ; 239                 if(len > sizeof(rxbuf)-1)
-1224  02bd 1e10          	ldw	x,(OFST-5,sp)
-1225  02bf a30020        	cpw	x,#32
-1226  02c2 2505          	jrult	L573
-1227                     ; 240                     len = sizeof(rxbuf)-1;
-1229  02c4 ae001f        	ldw	x,#31
-1230  02c7 1f10          	ldw	(OFST-5,sp),x
-1232  02c9               L573:
-1233                     ; 242                 recv(SOCK_TCPS, rxbuf, len);
-1235  02c9 1e10          	ldw	x,(OFST-5,sp)
-1236  02cb 89            	pushw	x
-1237  02cc ae0000        	ldw	x,#_rxbuf
-1238  02cf 89            	pushw	x
-1239  02d0 4f            	clr	a
-1240  02d1 cd0000        	call	_recv
-1242  02d4 5b04          	addw	sp,#4
-1243                     ; 244                 if(rxbuf[0]=='R' && rxbuf[2]==',')
-1245  02d6 b600          	ld	a,_rxbuf
-1246  02d8 a152          	cp	a,#82
-1247  02da 2703          	jreq	L411
-1248  02dc cc036b        	jp	L373
-1249  02df               L411:
-1251  02df b602          	ld	a,_rxbuf+2
-1252  02e1 a12c          	cp	a,#44
-1253  02e3 2703          	jreq	L611
-1254  02e5 cc036b        	jp	L373
-1255  02e8               L611:
-1256                     ; 246                     uint8_t relay = rxbuf[1]-'0';
-1258  02e8 b601          	ld	a,_rxbuf+1
-1259  02ea a030          	sub	a,#48
-1260  02ec 6b01          	ld	(OFST-20,sp),a
-1262                     ; 247                     uint8_t state = rxbuf[3]-'0';
-1264  02ee b603          	ld	a,_rxbuf+3
-1265  02f0 a030          	sub	a,#48
-1266  02f2 6b02          	ld	(OFST-19,sp),a
-1268                     ; 249                     GPIO_TypeDef* port = 0;
-1270  02f4 5f            	clrw	x
-1271  02f5 1f10          	ldw	(OFST-5,sp),x
-1273                     ; 250                     uint8_t pin = 0;
-1275  02f7 0f05          	clr	(OFST-16,sp)
-1277                     ; 252                     switch(relay)
-1279  02f9 7b01          	ld	a,(OFST-20,sp)
-1281                     ; 259                         case 6: port=GPIOC; pin=GPIO_PIN_4; break;
-1282  02fb 4a            	dec	a
-1283  02fc 2711          	jreq	L512
-1284  02fe 4a            	dec	a
-1285  02ff 2719          	jreq	L712
-1286  0301 4a            	dec	a
-1287  0302 2721          	jreq	L122
-1288  0304 4a            	dec	a
-1289  0305 2729          	jreq	L322
-1290  0307 4a            	dec	a
-1291  0308 2731          	jreq	L522
-1292  030a 4a            	dec	a
-1293  030b 2739          	jreq	L722
-1294  030d 2040          	jra	L304
-1295  030f               L512:
-1296                     ; 254                         case 1: port=GPIOB; pin=GPIO_PIN_3; break;
-1298  030f ae5005        	ldw	x,#20485
-1299  0312 1f10          	ldw	(OFST-5,sp),x
-1303  0314 a608          	ld	a,#8
-1304  0316 6b05          	ld	(OFST-16,sp),a
-1308  0318 2035          	jra	L304
-1309  031a               L712:
-1310                     ; 255                         case 2: port=GPIOB; pin=GPIO_PIN_2; break;
-1312  031a ae5005        	ldw	x,#20485
-1313  031d 1f10          	ldw	(OFST-5,sp),x
-1317  031f a604          	ld	a,#4
-1318  0321 6b05          	ld	(OFST-16,sp),a
-1322  0323 202a          	jra	L304
-1323  0325               L122:
-1324                     ; 256                         case 3: port=GPIOB; pin=GPIO_PIN_1; break;
-1326  0325 ae5005        	ldw	x,#20485
-1327  0328 1f10          	ldw	(OFST-5,sp),x
-1331  032a a602          	ld	a,#2
-1332  032c 6b05          	ld	(OFST-16,sp),a
-1336  032e 201f          	jra	L304
-1337  0330               L322:
-1338                     ; 257                         case 4: port=GPIOB; pin=GPIO_PIN_0; break;
-1340  0330 ae5005        	ldw	x,#20485
-1341  0333 1f10          	ldw	(OFST-5,sp),x
-1345  0335 a601          	ld	a,#1
-1346  0337 6b05          	ld	(OFST-16,sp),a
-1350  0339 2014          	jra	L304
-1351  033b               L522:
-1352                     ; 258                         case 5: port=GPIOC; pin=GPIO_PIN_3; break;
-1354  033b ae500a        	ldw	x,#20490
-1355  033e 1f10          	ldw	(OFST-5,sp),x
-1359  0340 a608          	ld	a,#8
-1360  0342 6b05          	ld	(OFST-16,sp),a
-1364  0344 2009          	jra	L304
-1365  0346               L722:
-1366                     ; 259                         case 6: port=GPIOC; pin=GPIO_PIN_4; break;
-1368  0346 ae500a        	ldw	x,#20490
-1369  0349 1f10          	ldw	(OFST-5,sp),x
-1373  034b a610          	ld	a,#16
-1374  034d 6b05          	ld	(OFST-16,sp),a
-1378  034f               L304:
-1379                     ; 262                     if(port)
-1381  034f 1e10          	ldw	x,(OFST-5,sp)
-1382  0351 2718          	jreq	L373
-1383                     ; 264                         if(state) GPIO_WriteHigh(port, pin);
-1385  0353 0d02          	tnz	(OFST-19,sp)
-1386  0355 270b          	jreq	L704
-1389  0357 7b05          	ld	a,(OFST-16,sp)
-1390  0359 88            	push	a
-1391  035a 1e11          	ldw	x,(OFST-4,sp)
-1392  035c cd0000        	call	_GPIO_WriteHigh
-1394  035f 84            	pop	a
-1396  0360 2009          	jra	L373
-1397  0362               L704:
-1398                     ; 265                         else      GPIO_WriteLow(port, pin);
-1400  0362 7b05          	ld	a,(OFST-16,sp)
-1401  0364 88            	push	a
-1402  0365 1e11          	ldw	x,(OFST-4,sp)
-1403  0367 cd0000        	call	_GPIO_WriteLow
-1405  036a 84            	pop	a
-1406  036b               L373:
-1407                     ; 271             send_timer++;
-1409  036b 1e03          	ldw	x,(OFST-18,sp)
-1410  036d 1c0001        	addw	x,#1
-1411  0370 1f03          	ldw	(OFST-18,sp),x
-1413                     ; 273             curr_state[0]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_2)==RESET)?'1':'0';
-1415  0372 4b04          	push	#4
-1416  0374 ae500f        	ldw	x,#20495
-1417  0377 cd0000        	call	_GPIO_ReadInputPin
-1419  037a 5b01          	addw	sp,#1
-1420  037c 4d            	tnz	a
-1421  037d 2604          	jrne	L05
-1422  037f a631          	ld	a,#49
-1423  0381 2002          	jra	L25
-1424  0383               L05:
-1425  0383 a630          	ld	a,#48
-1426  0385               L25:
-1427  0385 6b12          	ld	(OFST-3,sp),a
-1429                     ; 274             curr_state[1]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_3)==RESET)?'1':'0';
-1431  0387 4b08          	push	#8
-1432  0389 ae500f        	ldw	x,#20495
-1433  038c cd0000        	call	_GPIO_ReadInputPin
-1435  038f 5b01          	addw	sp,#1
-1436  0391 4d            	tnz	a
-1437  0392 2604          	jrne	L45
-1438  0394 a631          	ld	a,#49
-1439  0396 2002          	jra	L65
-1440  0398               L45:
-1441  0398 a630          	ld	a,#48
-1442  039a               L65:
-1443  039a 6b13          	ld	(OFST-2,sp),a
-1445                     ; 275             curr_state[2]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_4)==RESET)?'1':'0';
-1447  039c 4b10          	push	#16
-1448  039e ae500f        	ldw	x,#20495
-1449  03a1 cd0000        	call	_GPIO_ReadInputPin
-1451  03a4 5b01          	addw	sp,#1
-1452  03a6 4d            	tnz	a
-1453  03a7 2604          	jrne	L06
-1454  03a9 a631          	ld	a,#49
-1455  03ab 2002          	jra	L26
-1456  03ad               L06:
-1457  03ad a630          	ld	a,#48
-1458  03af               L26:
-1459  03af 6b14          	ld	(OFST-1,sp),a
-1461                     ; 276             curr_state[3]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_7)==RESET)?'1':'0';
-1463  03b1 4b80          	push	#128
-1464  03b3 ae500f        	ldw	x,#20495
-1465  03b6 cd0000        	call	_GPIO_ReadInputPin
-1467  03b9 5b01          	addw	sp,#1
-1468  03bb 4d            	tnz	a
-1469  03bc 2604          	jrne	L46
-1470  03be a631          	ld	a,#49
-1471  03c0 2002          	jra	L66
-1472  03c2               L46:
-1473  03c2 a630          	ld	a,#48
-1474  03c4               L66:
-1475  03c4 6b15          	ld	(OFST+0,sp),a
-1477                     ; 278             changed =
-1477                     ; 279                 (curr_state[0] != prev_state[0]) ||
-1477                     ; 280                 (curr_state[1] != prev_state[1]) ||
-1477                     ; 281                 (curr_state[2] != prev_state[2]) ||
-1477                     ; 282                 (curr_state[3] != prev_state[3]);
-1479  03c6 7b12          	ld	a,(OFST-3,sp)
-1480  03c8 1106          	cp	a,(OFST-15,sp)
-1481  03ca 2612          	jrne	L27
-1482  03cc 7b13          	ld	a,(OFST-2,sp)
-1483  03ce 1107          	cp	a,(OFST-14,sp)
-1484  03d0 260c          	jrne	L27
-1485  03d2 7b14          	ld	a,(OFST-1,sp)
-1486  03d4 1108          	cp	a,(OFST-13,sp)
-1487  03d6 2606          	jrne	L27
-1488  03d8 7b15          	ld	a,(OFST+0,sp)
-1489  03da 1109          	cp	a,(OFST-12,sp)
-1490  03dc 2704          	jreq	L07
-1491  03de               L27:
-1492  03de a601          	ld	a,#1
-1493  03e0 2001          	jra	L47
-1494  03e2               L07:
-1495  03e2 4f            	clr	a
-1496  03e3               L47:
-1497  03e3 6b05          	ld	(OFST-16,sp),a
-1499                     ; 284             if(changed || send_timer >= 100)   // ~1 sec
-1501  03e5 0d05          	tnz	(OFST-16,sp)
-1502  03e7 260a          	jrne	L514
-1504  03e9 1e03          	ldw	x,(OFST-18,sp)
-1505  03eb a30064        	cpw	x,#100
-1506  03ee 2403          	jruge	L021
-1507  03f0 cc0191        	jp	L753
-1508  03f3               L021:
-1509  03f3               L514:
-1510                     ; 286                 send_timer = 0;
-1512  03f3 5f            	clrw	x
-1513  03f4 1f03          	ldw	(OFST-18,sp),x
-1515                     ; 288                 if(getSn_SR(SOCK_TCPS) != SOCK_ESTABLISHED)
-1517  03f6 ae0308        	ldw	x,#776
-1518  03f9 89            	pushw	x
-1519  03fa ae0000        	ldw	x,#0
-1520  03fd 89            	pushw	x
-1521  03fe cd0000        	call	_WIZCHIP_READ
-1523  0401 5b04          	addw	sp,#4
-1524  0403 a117          	cp	a,#23
-1525  0405 2703          	jreq	L221
-1526  0407 cc0191        	jp	L753
-1527  040a               L221:
-1528                     ; 289                     break;
-1530                     ; 291                 txbuf[0]=curr_state[0];
-1532  040a 7b12          	ld	a,(OFST-3,sp)
-1533  040c 6b0a          	ld	(OFST-11,sp),a
-1535                     ; 292                 txbuf[1]=curr_state[1];
-1537  040e 7b13          	ld	a,(OFST-2,sp)
-1538  0410 6b0b          	ld	(OFST-10,sp),a
-1540                     ; 293                 txbuf[2]=curr_state[2];
-1542  0412 7b14          	ld	a,(OFST-1,sp)
-1543  0414 6b0c          	ld	(OFST-9,sp),a
-1545                     ; 294                 txbuf[3]=curr_state[3];
-1547  0416 7b15          	ld	a,(OFST+0,sp)
-1548  0418 6b0d          	ld	(OFST-8,sp),a
-1550                     ; 295                 txbuf[4]='\r';
-1552  041a a60d          	ld	a,#13
-1553  041c 6b0e          	ld	(OFST-7,sp),a
-1555                     ; 296                 txbuf[5]='\n';
-1557  041e a60a          	ld	a,#10
-1558  0420 6b0f          	ld	(OFST-6,sp),a
-1560                     ; 298                 free = getSn_TX_FSR(SOCK_TCPS);
-1562  0422 4f            	clr	a
-1563  0423 cd0000        	call	_getSn_TX_FSR
-1565  0426 1f10          	ldw	(OFST-5,sp),x
-1567                     ; 300                 if(free >= 16)   // ✅ stronger safety
-1569  0428 1e10          	ldw	x,(OFST-5,sp)
-1570  042a a30010        	cpw	x,#16
-1571  042d 2524          	jrult	L124
-1572                     ; 302                     if(send(SOCK_TCPS, txbuf, 6) <= 0)
-1574  042f 9c            	rvf
-1575  0430 ae0006        	ldw	x,#6
-1576  0433 89            	pushw	x
-1577  0434 96            	ldw	x,sp
-1578  0435 1c000c        	addw	x,#OFST-9
-1579  0438 89            	pushw	x
-1580  0439 4f            	clr	a
-1581  043a cd0000        	call	_send
-1583  043d 9c            	rvf
-1584  043e 5b04          	addw	sp,#4
-1585  0440 cd0000        	call	c_lrzmp
-1587  0443 2c08          	jrsgt	L324
-1588                     ; 304                         disconnect(SOCK_TCPS);   // ✅ safe recovery
-1590  0445 4f            	clr	a
-1591  0446 cd0000        	call	_disconnect
-1593                     ; 305                         break;
-1595  0449 ac910191      	jpf	L753
-1596  044d               L324:
-1597                     ; 308                     delay_ms(5);   // ✅ IMPORTANT
-1599  044d ae0005        	ldw	x,#5
-1600  0450 cd0000        	call	_delay_ms
-1602  0453               L124:
-1603                     ; 311                 prev_state[0]=curr_state[0];
-1605  0453 7b12          	ld	a,(OFST-3,sp)
-1606  0455 6b06          	ld	(OFST-15,sp),a
-1608                     ; 312                 prev_state[1]=curr_state[1];
-1610  0457 7b13          	ld	a,(OFST-2,sp)
-1611  0459 6b07          	ld	(OFST-14,sp),a
-1613                     ; 313                 prev_state[2]=curr_state[2];
-1615  045b 7b14          	ld	a,(OFST-1,sp)
-1616  045d 6b08          	ld	(OFST-13,sp),a
-1618                     ; 314                 prev_state[3]=curr_state[3];
-1620  045f 7b15          	ld	a,(OFST+0,sp)
-1621  0461 6b09          	ld	(OFST-12,sp),a
-1623  0463 ac910191      	jpf	L753
-1624  0467               L132:
-1625                     ; 320         case SOCK_CLOSE_WAIT:
-1625                     ; 321             disconnect(SOCK_TCPS);
-1627  0467 4f            	clr	a
-1628  0468 cd0000        	call	_disconnect
-1630                     ; 322             break;
-1632  046b ac910191      	jpf	L753
-1633  046f               L332:
-1634                     ; 324         case SOCK_FIN_WAIT:
-1634                     ; 325         case SOCK_CLOSING:
-1634                     ; 326         case SOCK_TIME_WAIT:
-1634                     ; 327         case SOCK_LAST_ACK:
-1634                     ; 328             close(SOCK_TCPS);
-1636  046f 4f            	clr	a
-1637  0470 cd0000        	call	_close
-1639                     ; 329             break;
-1641  0473 ac910191      	jpf	L753
-1642  0477               L532:
-1643                     ; 331         default:
-1643                     ; 332             break;
-1645  0477 ac910191      	jpf	L753
-1646  047b               L563:
-1648  047b ac910191      	jpf	L753
-1799                     	xdef	_main
-1800                     	xdef	_GPIO_Config
-1801                     	xdef	_W5500_Init
-1802                     	xdef	_W5500_Reset
-1803                     	xdef	_SPI_Config
-1804                     	xdef	_spi_readbyte
-1805                     	xdef	_spi_writebyte
-1806                     	xdef	_wizchip_deselect
-1807                     	xdef	_wizchip_select
-1808                     	xdef	_delay_ms
-1809                     	xdef	_netinfo
-1810                     	switch	.ubsct
-1811  0000               _rxbuf:
-1812  0000 000000000000  	ds.b	32
-1813                     	xdef	_rxbuf
-1814                     	xdef	_changed
-1815                     	xdef	_rxsize
-1816                     	xdef	_txsize
-1817                     	xref	_recv
-1818                     	xref	_send
-1819                     	xref	_disconnect
-1820                     	xref	_listen
-1821                     	xref	_close
-1822                     	xref	_socket
-1823                     	xref	_wizchip_setnetinfo
-1824                     	xref	_wizchip_init
-1825                     	xref	_reg_wizchip_spi_cbfunc
-1826                     	xref	_reg_wizchip_cs_cbfunc
-1827                     	xref	_getSn_RX_RSR
-1828                     	xref	_getSn_TX_FSR
-1829                     	xref	_WIZCHIP_WRITE
-1830                     	xref	_WIZCHIP_READ
-1831                     	xref	_CLK_HSIPrescalerConfig
-1832                     	xref	_SPI_GetFlagStatus
-1833                     	xref	_SPI_ReceiveData
-1834                     	xref	_SPI_SendData
-1835                     	xref	_SPI_Cmd
-1836                     	xref	_SPI_Init
-1837                     	xref	_SPI_DeInit
-1838                     	xref	_GPIO_ReadInputPin
-1839                     	xref	_GPIO_WriteLow
-1840                     	xref	_GPIO_WriteHigh
-1841                     	xref	_GPIO_Init
-1842                     	xref.b	c_x
-1862                     	xref	c_lrzmp
-1863                     	xref	c_xymov
-1864                     	end
+ 826                     ; 163 void main(void)
+ 826                     ; 164 {
+ 827                     	switch	.text
+ 828  016f               _main:
+ 830  016f 5213          	subw	sp,#19
+ 831       00000013      OFST:	set	19
+ 834                     ; 169     uint8_t prev_state[4] = {'0','0','0','0'};
+ 836  0171 96            	ldw	x,sp
+ 837  0172 1c0006        	addw	x,#OFST-13
+ 838  0175 90ae0000      	ldw	y,#L502_prev_state
+ 839  0179 a604          	ld	a,#4
+ 840  017b cd0000        	call	c_xymov
+ 842                     ; 172     uint16_t send_timer = 0;
+ 844  017e 5f            	clrw	x
+ 845  017f 1f02          	ldw	(OFST-17,sp),x
+ 847                     ; 174     CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
+ 849  0181 4f            	clr	a
+ 850  0182 cd0000        	call	_CLK_HSIPrescalerConfig
+ 852                     ; 176     SPI_Config();
+ 854  0185 cd0065        	call	_SPI_Config
+ 856                     ; 177     GPIO_Config();
+ 858  0188 cd0100        	call	_GPIO_Config
+ 860                     ; 179     W5500_Reset();
+ 862  018b cd00ae        	call	_W5500_Reset
+ 864                     ; 180     W5500_Init();
+ 866  018e cd00d8        	call	_W5500_Init
+ 868  0191               L103:
+ 869                     ; 184         switch(getSn_SR(SOCK_TCPS))
+ 871  0191 ae0308        	ldw	x,#776
+ 872  0194 89            	pushw	x
+ 873  0195 ae0000        	ldw	x,#0
+ 874  0198 89            	pushw	x
+ 875  0199 cd0000        	call	_WIZCHIP_READ
+ 877  019c 5b04          	addw	sp,#4
+ 879                     ; 338         default:
+ 879                     ; 339             break;
+ 880  019e 4d            	tnz	a
+ 881  019f 2729          	jreq	L702
+ 882  01a1 a013          	sub	a,#19
+ 883  01a3 273f          	jreq	L112
+ 884  01a5 a004          	sub	a,#4
+ 885  01a7 2741          	jreq	L312
+ 886  01a9 4a            	dec	a
+ 887  01aa 2603          	jrne	L67
+ 888  01ac cc04b0        	jp	L332
+ 889  01af               L67:
+ 890  01af a002          	sub	a,#2
+ 891  01b1 2603          	jrne	L001
+ 892  01b3 cc04b0        	jp	L332
+ 893  01b6               L001:
+ 894  01b6 4a            	dec	a
+ 895  01b7 2603          	jrne	L201
+ 896  01b9 cc04b0        	jp	L332
+ 897  01bc               L201:
+ 898  01bc 4a            	dec	a
+ 899  01bd 2603          	jrne	L401
+ 900  01bf cc04a8        	jp	L132
+ 901  01c2               L401:
+ 902  01c2 4a            	dec	a
+ 903  01c3 2603          	jrne	L601
+ 904  01c5 cc04b0        	jp	L332
+ 905  01c8               L601:
+ 906  01c8 20c7          	jra	L103
+ 907  01ca               L702:
+ 908                     ; 186         case SOCK_CLOSED:
+ 908                     ; 187             close(SOCK_TCPS);
+ 910  01ca 4f            	clr	a
+ 911  01cb cd0000        	call	_close
+ 913                     ; 188             socket(SOCK_TCPS, Sn_MR_TCP, TCP_PORT, 0);
+ 915  01ce 4b00          	push	#0
+ 916  01d0 ae1388        	ldw	x,#5000
+ 917  01d3 89            	pushw	x
+ 918  01d4 ae0001        	ldw	x,#1
+ 919  01d7 cd0000        	call	_socket
+ 921  01da 5b03          	addw	sp,#3
+ 922                     ; 189             delay_ms(100);
+ 924  01dc ae0064        	ldw	x,#100
+ 925  01df cd0000        	call	_delay_ms
+ 927                     ; 190             break;
+ 929  01e2 20ad          	jra	L103
+ 930  01e4               L112:
+ 931                     ; 192         case SOCK_INIT:
+ 931                     ; 193             listen(SOCK_TCPS);
+ 933  01e4 4f            	clr	a
+ 934  01e5 cd0000        	call	_listen
+ 936                     ; 194             break;
+ 938  01e8 20a7          	jra	L103
+ 939  01ea               L312:
+ 940                     ; 196         case SOCK_ESTABLISHED:
+ 940                     ; 197 
+ 940                     ; 198             /* ✅ Connection event */
+ 940                     ; 199             if(getSn_IR(SOCK_TCPS) & Sn_IR_CON)
+ 942  01ea ae0208        	ldw	x,#520
+ 943  01ed 89            	pushw	x
+ 944  01ee ae0000        	ldw	x,#0
+ 945  01f1 89            	pushw	x
+ 946  01f2 cd0000        	call	_WIZCHIP_READ
+ 948  01f5 5b04          	addw	sp,#4
+ 949  01f7 a41f          	and	a,#31
+ 950  01f9 a501          	bcp	a,#1
+ 951  01fb 2603          	jrne	L011
+ 952  01fd cc0293        	jp	L113
+ 953  0200               L011:
+ 954                     ; 201                 setSn_IR(SOCK_TCPS, Sn_IR_CON);
+ 956  0200 4b01          	push	#1
+ 957  0202 ae0208        	ldw	x,#520
+ 958  0205 89            	pushw	x
+ 959  0206 ae0000        	ldw	x,#0
+ 960  0209 89            	pushw	x
+ 961  020a cd0000        	call	_WIZCHIP_WRITE
+ 963  020d 5b05          	addw	sp,#5
+ 964                     ; 203                 prev_state[0]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_2)==RESET)?'1':'0';
+ 966  020f 4b04          	push	#4
+ 967  0211 ae500f        	ldw	x,#20495
+ 968  0214 cd0000        	call	_GPIO_ReadInputPin
+ 970  0217 5b01          	addw	sp,#1
+ 971  0219 4d            	tnz	a
+ 972  021a 2604          	jrne	L03
+ 973  021c a631          	ld	a,#49
+ 974  021e 2002          	jra	L23
+ 975  0220               L03:
+ 976  0220 a630          	ld	a,#48
+ 977  0222               L23:
+ 978  0222 6b06          	ld	(OFST-13,sp),a
+ 980                     ; 204                 prev_state[1]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_3)==RESET)?'1':'0';
+ 982  0224 4b08          	push	#8
+ 983  0226 ae500f        	ldw	x,#20495
+ 984  0229 cd0000        	call	_GPIO_ReadInputPin
+ 986  022c 5b01          	addw	sp,#1
+ 987  022e 4d            	tnz	a
+ 988  022f 2604          	jrne	L43
+ 989  0231 a631          	ld	a,#49
+ 990  0233 2002          	jra	L63
+ 991  0235               L43:
+ 992  0235 a630          	ld	a,#48
+ 993  0237               L63:
+ 994  0237 6b07          	ld	(OFST-12,sp),a
+ 996                     ; 205                 prev_state[2]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_4)==RESET)?'1':'0';
+ 998  0239 4b10          	push	#16
+ 999  023b ae500f        	ldw	x,#20495
+1000  023e cd0000        	call	_GPIO_ReadInputPin
+1002  0241 5b01          	addw	sp,#1
+1003  0243 4d            	tnz	a
+1004  0244 2604          	jrne	L04
+1005  0246 a631          	ld	a,#49
+1006  0248 2002          	jra	L24
+1007  024a               L04:
+1008  024a a630          	ld	a,#48
+1009  024c               L24:
+1010  024c 6b08          	ld	(OFST-11,sp),a
+1012                     ; 206                 prev_state[3]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_7)==RESET)?'1':'0';
+1014  024e 4b80          	push	#128
+1015  0250 ae500f        	ldw	x,#20495
+1016  0253 cd0000        	call	_GPIO_ReadInputPin
+1018  0256 5b01          	addw	sp,#1
+1019  0258 4d            	tnz	a
+1020  0259 2604          	jrne	L44
+1021  025b a631          	ld	a,#49
+1022  025d 2002          	jra	L64
+1023  025f               L44:
+1024  025f a630          	ld	a,#48
+1025  0261               L64:
+1026  0261 6b09          	ld	(OFST-10,sp),a
+1028                     ; 208                 txbuf[0]=prev_state[0];
+1030  0263 7b06          	ld	a,(OFST-13,sp)
+1031  0265 6b0e          	ld	(OFST-5,sp),a
+1033                     ; 209                 txbuf[1]=prev_state[1];
+1035  0267 7b07          	ld	a,(OFST-12,sp)
+1036  0269 6b0f          	ld	(OFST-4,sp),a
+1038                     ; 210                 txbuf[2]=prev_state[2];
+1040  026b 7b08          	ld	a,(OFST-11,sp)
+1041  026d 6b10          	ld	(OFST-3,sp),a
+1043                     ; 211                 txbuf[3]=prev_state[3];
+1045  026f 7b09          	ld	a,(OFST-10,sp)
+1046  0271 6b11          	ld	(OFST-2,sp),a
+1048                     ; 212                 txbuf[4]='\r';
+1050  0273 a60d          	ld	a,#13
+1051  0275 6b12          	ld	(OFST-1,sp),a
+1053                     ; 213                 txbuf[5]='\n';
+1055  0277 a60a          	ld	a,#10
+1056  0279 6b13          	ld	(OFST+0,sp),a
+1058                     ; 215                 if(getSn_TX_FSR(SOCK_TCPS) >= 12)
+1060  027b 4f            	clr	a
+1061  027c cd0000        	call	_getSn_TX_FSR
+1063  027f a3000c        	cpw	x,#12
+1064  0282 250f          	jrult	L113
+1065                     ; 216                     send(SOCK_TCPS, txbuf, 6);
+1067  0284 ae0006        	ldw	x,#6
+1068  0287 89            	pushw	x
+1069  0288 96            	ldw	x,sp
+1070  0289 1c0010        	addw	x,#OFST-3
+1071  028c 89            	pushw	x
+1072  028d 4f            	clr	a
+1073  028e cd0000        	call	_send
+1075  0291 5b04          	addw	sp,#4
+1076  0293               L113:
+1077                     ; 220             len = getSn_RX_RSR(SOCK_TCPS);
+1079  0293 4f            	clr	a
+1080  0294 cd0000        	call	_getSn_RX_RSR
+1082  0297 1f04          	ldw	(OFST-15,sp),x
+1084                     ; 222             if(len >= 4)
+1086  0299 1e04          	ldw	x,(OFST-15,sp)
+1087  029b a30004        	cpw	x,#4
+1088  029e 2403          	jruge	L211
+1089  02a0 cc0397        	jp	L513
+1090  02a3               L211:
+1091                     ; 224                 if(len > sizeof(rxbuf)-1)
+1093  02a3 1e04          	ldw	x,(OFST-15,sp)
+1094  02a5 a30020        	cpw	x,#32
+1095  02a8 2505          	jrult	L713
+1096                     ; 225                     len = sizeof(rxbuf)-1;
+1098  02aa ae001f        	ldw	x,#31
+1099  02ad 1f04          	ldw	(OFST-15,sp),x
+1101  02af               L713:
+1102                     ; 227                 recv(SOCK_TCPS, rxbuf, len);
+1104  02af 1e04          	ldw	x,(OFST-15,sp)
+1105  02b1 89            	pushw	x
+1106  02b2 ae0000        	ldw	x,#_rxbuf
+1107  02b5 89            	pushw	x
+1108  02b6 4f            	clr	a
+1109  02b7 cd0000        	call	_recv
+1111  02ba 5b04          	addw	sp,#4
+1112                     ; 229                 if(rxbuf[0]=='R' && rxbuf[2]==',')
+1114  02bc b600          	ld	a,_rxbuf
+1115  02be a152          	cp	a,#82
+1116  02c0 2703          	jreq	L411
+1117  02c2 cc0397        	jp	L513
+1118  02c5               L411:
+1120  02c5 b602          	ld	a,_rxbuf+2
+1121  02c7 a12c          	cp	a,#44
+1122  02c9 2703          	jreq	L611
+1123  02cb cc0397        	jp	L513
+1124  02ce               L611:
+1125                     ; 231                     switch(rxbuf[1])
+1127  02ce b601          	ld	a,_rxbuf+1
+1129                     ; 261                             break;
+1130  02d0 a031          	sub	a,#49
+1131  02d2 2719          	jreq	L512
+1132  02d4 4a            	dec	a
+1133  02d5 2736          	jreq	L712
+1134  02d7 4a            	dec	a
+1135  02d8 274f          	jreq	L122
+1136  02da 4a            	dec	a
+1137  02db 2768          	jreq	L322
+1138  02dd 4a            	dec	a
+1139  02de 2603cc0361    	jreq	L522
+1140  02e3 4a            	dec	a
+1141  02e4 2603          	jrne	L021
+1142  02e6 cc037d        	jp	L722
+1143  02e9               L021:
+1144  02e9 ac970397      	jpf	L513
+1145  02ed               L512:
+1146                     ; 233                         case '1':
+1146                     ; 234                             if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOB,GPIO_PIN_3);
+1148  02ed b603          	ld	a,_rxbuf+3
+1149  02ef a131          	cp	a,#49
+1150  02f1 260d          	jrne	L723
+1153  02f3 4b08          	push	#8
+1154  02f5 ae5005        	ldw	x,#20485
+1155  02f8 cd0000        	call	_GPIO_WriteHigh
+1157  02fb 84            	pop	a
+1159  02fc ac970397      	jpf	L513
+1160  0300               L723:
+1161                     ; 235                             else GPIO_WriteLow(GPIOB,GPIO_PIN_3);
+1163  0300 4b08          	push	#8
+1164  0302 ae5005        	ldw	x,#20485
+1165  0305 cd0000        	call	_GPIO_WriteLow
+1167  0308 84            	pop	a
+1168  0309 ac970397      	jpf	L513
+1169  030d               L712:
+1170                     ; 238                         case '2':
+1170                     ; 239                             if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOB,GPIO_PIN_2);
+1172  030d b603          	ld	a,_rxbuf+3
+1173  030f a131          	cp	a,#49
+1174  0311 260b          	jrne	L333
+1177  0313 4b04          	push	#4
+1178  0315 ae5005        	ldw	x,#20485
+1179  0318 cd0000        	call	_GPIO_WriteHigh
+1181  031b 84            	pop	a
+1183  031c 2079          	jra	L513
+1184  031e               L333:
+1185                     ; 240                             else GPIO_WriteLow(GPIOB,GPIO_PIN_2);
+1187  031e 4b04          	push	#4
+1188  0320 ae5005        	ldw	x,#20485
+1189  0323 cd0000        	call	_GPIO_WriteLow
+1191  0326 84            	pop	a
+1192  0327 206e          	jra	L513
+1193  0329               L122:
+1194                     ; 243                         case '3':
+1194                     ; 244                             if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOB,GPIO_PIN_1);
+1196  0329 b603          	ld	a,_rxbuf+3
+1197  032b a131          	cp	a,#49
+1198  032d 260b          	jrne	L733
+1201  032f 4b02          	push	#2
+1202  0331 ae5005        	ldw	x,#20485
+1203  0334 cd0000        	call	_GPIO_WriteHigh
+1205  0337 84            	pop	a
+1207  0338 205d          	jra	L513
+1208  033a               L733:
+1209                     ; 245                             else GPIO_WriteLow(GPIOB,GPIO_PIN_1);
+1211  033a 4b02          	push	#2
+1212  033c ae5005        	ldw	x,#20485
+1213  033f cd0000        	call	_GPIO_WriteLow
+1215  0342 84            	pop	a
+1216  0343 2052          	jra	L513
+1217  0345               L322:
+1218                     ; 248                         case '4':
+1218                     ; 249                             if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOB,GPIO_PIN_0);
+1220  0345 b603          	ld	a,_rxbuf+3
+1221  0347 a131          	cp	a,#49
+1222  0349 260b          	jrne	L343
+1225  034b 4b01          	push	#1
+1226  034d ae5005        	ldw	x,#20485
+1227  0350 cd0000        	call	_GPIO_WriteHigh
+1229  0353 84            	pop	a
+1231  0354 2041          	jra	L513
+1232  0356               L343:
+1233                     ; 250                             else GPIO_WriteLow(GPIOB,GPIO_PIN_0);
+1235  0356 4b01          	push	#1
+1236  0358 ae5005        	ldw	x,#20485
+1237  035b cd0000        	call	_GPIO_WriteLow
+1239  035e 84            	pop	a
+1240  035f 2036          	jra	L513
+1241  0361               L522:
+1242                     ; 253                         case '5':
+1242                     ; 254                             if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOC,GPIO_PIN_3);
+1244  0361 b603          	ld	a,_rxbuf+3
+1245  0363 a131          	cp	a,#49
+1246  0365 260b          	jrne	L743
+1249  0367 4b08          	push	#8
+1250  0369 ae500a        	ldw	x,#20490
+1251  036c cd0000        	call	_GPIO_WriteHigh
+1253  036f 84            	pop	a
+1255  0370 2025          	jra	L513
+1256  0372               L743:
+1257                     ; 255                             else GPIO_WriteLow(GPIOC,GPIO_PIN_3);
+1259  0372 4b08          	push	#8
+1260  0374 ae500a        	ldw	x,#20490
+1261  0377 cd0000        	call	_GPIO_WriteLow
+1263  037a 84            	pop	a
+1264  037b 201a          	jra	L513
+1265  037d               L722:
+1266                     ; 258                         case '6':
+1266                     ; 259                             if(rxbuf[3]=='1') GPIO_WriteHigh(GPIOC,GPIO_PIN_4);
+1268  037d b603          	ld	a,_rxbuf+3
+1269  037f a131          	cp	a,#49
+1270  0381 260b          	jrne	L353
+1273  0383 4b10          	push	#16
+1274  0385 ae500a        	ldw	x,#20490
+1275  0388 cd0000        	call	_GPIO_WriteHigh
+1277  038b 84            	pop	a
+1279  038c 2009          	jra	L513
+1280  038e               L353:
+1281                     ; 260                             else GPIO_WriteLow(GPIOC,GPIO_PIN_4);
+1283  038e 4b10          	push	#16
+1284  0390 ae500a        	ldw	x,#20490
+1285  0393 cd0000        	call	_GPIO_WriteLow
+1287  0396 84            	pop	a
+1288  0397               L523:
+1289  0397               L513:
+1290                     ; 267             curr_state[0]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_2)==RESET)?'1':'0';
+1292  0397 4b04          	push	#4
+1293  0399 ae500f        	ldw	x,#20495
+1294  039c cd0000        	call	_GPIO_ReadInputPin
+1296  039f 5b01          	addw	sp,#1
+1297  03a1 4d            	tnz	a
+1298  03a2 2604          	jrne	L05
+1299  03a4 a631          	ld	a,#49
+1300  03a6 2002          	jra	L25
+1301  03a8               L05:
+1302  03a8 a630          	ld	a,#48
+1303  03aa               L25:
+1304  03aa 6b0a          	ld	(OFST-9,sp),a
+1306                     ; 268             curr_state[1]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_3)==RESET)?'1':'0';
+1308  03ac 4b08          	push	#8
+1309  03ae ae500f        	ldw	x,#20495
+1310  03b1 cd0000        	call	_GPIO_ReadInputPin
+1312  03b4 5b01          	addw	sp,#1
+1313  03b6 4d            	tnz	a
+1314  03b7 2604          	jrne	L45
+1315  03b9 a631          	ld	a,#49
+1316  03bb 2002          	jra	L65
+1317  03bd               L45:
+1318  03bd a630          	ld	a,#48
+1319  03bf               L65:
+1320  03bf 6b0b          	ld	(OFST-8,sp),a
+1322                     ; 269             curr_state[2]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_4)==RESET)?'1':'0';
+1324  03c1 4b10          	push	#16
+1325  03c3 ae500f        	ldw	x,#20495
+1326  03c6 cd0000        	call	_GPIO_ReadInputPin
+1328  03c9 5b01          	addw	sp,#1
+1329  03cb 4d            	tnz	a
+1330  03cc 2604          	jrne	L06
+1331  03ce a631          	ld	a,#49
+1332  03d0 2002          	jra	L26
+1333  03d2               L06:
+1334  03d2 a630          	ld	a,#48
+1335  03d4               L26:
+1336  03d4 6b0c          	ld	(OFST-7,sp),a
+1338                     ; 270             curr_state[3]=(GPIO_ReadInputPin(GPIOD,GPIO_PIN_7)==RESET)?'1':'0';
+1340  03d6 4b80          	push	#128
+1341  03d8 ae500f        	ldw	x,#20495
+1342  03db cd0000        	call	_GPIO_ReadInputPin
+1344  03de 5b01          	addw	sp,#1
+1345  03e0 4d            	tnz	a
+1346  03e1 2604          	jrne	L46
+1347  03e3 a631          	ld	a,#49
+1348  03e5 2002          	jra	L66
+1349  03e7               L46:
+1350  03e7 a630          	ld	a,#48
+1351  03e9               L66:
+1352  03e9 6b0d          	ld	(OFST-6,sp),a
+1354                     ; 272             changed =
+1354                     ; 273                 (curr_state[0]!=prev_state[0]) ||
+1354                     ; 274                 (curr_state[1]!=prev_state[1]) ||
+1354                     ; 275                 (curr_state[2]!=prev_state[2]) ||
+1354                     ; 276                 (curr_state[3]!=prev_state[3]);
+1356  03eb 7b0a          	ld	a,(OFST-9,sp)
+1357  03ed 1106          	cp	a,(OFST-13,sp)
+1358  03ef 2612          	jrne	L27
+1359  03f1 7b0b          	ld	a,(OFST-8,sp)
+1360  03f3 1107          	cp	a,(OFST-12,sp)
+1361  03f5 260c          	jrne	L27
+1362  03f7 7b0c          	ld	a,(OFST-7,sp)
+1363  03f9 1108          	cp	a,(OFST-11,sp)
+1364  03fb 2606          	jrne	L27
+1365  03fd 7b0d          	ld	a,(OFST-6,sp)
+1366  03ff 1109          	cp	a,(OFST-10,sp)
+1367  0401 2704          	jreq	L07
+1368  0403               L27:
+1369  0403 a601          	ld	a,#1
+1370  0405 2001          	jra	L47
+1371  0407               L07:
+1372  0407 4f            	clr	a
+1373  0408               L47:
+1374  0408 6b01          	ld	(OFST-18,sp),a
+1376                     ; 279             send_timer++;
+1378  040a 1e02          	ldw	x,(OFST-17,sp)
+1379  040c 1c0001        	addw	x,#1
+1380  040f 1f02          	ldw	(OFST-17,sp),x
+1382                     ; 281             if(send_timer >= 30)   // ~300ms (10ms loop delay below)
+1384  0411 1e02          	ldw	x,(OFST-17,sp)
+1385  0413 a3001e        	cpw	x,#30
+1386  0416 2542          	jrult	L753
+1387                     ; 283                 send_timer = 0;
+1389  0418 5f            	clrw	x
+1390  0419 1f02          	ldw	(OFST-17,sp),x
+1392                     ; 285                 txbuf[0]=curr_state[0];
+1394  041b 7b0a          	ld	a,(OFST-9,sp)
+1395  041d 6b0e          	ld	(OFST-5,sp),a
+1397                     ; 286                 txbuf[1]=curr_state[1];
+1399  041f 7b0b          	ld	a,(OFST-8,sp)
+1400  0421 6b0f          	ld	(OFST-4,sp),a
+1402                     ; 287                 txbuf[2]=curr_state[2];
+1404  0423 7b0c          	ld	a,(OFST-7,sp)
+1405  0425 6b10          	ld	(OFST-3,sp),a
+1407                     ; 288                 txbuf[3]=curr_state[3];
+1409  0427 7b0d          	ld	a,(OFST-6,sp)
+1410  0429 6b11          	ld	(OFST-2,sp),a
+1412                     ; 289                 txbuf[4]='\r';
+1414  042b a60d          	ld	a,#13
+1415  042d 6b12          	ld	(OFST-1,sp),a
+1417                     ; 290                 txbuf[5]='\n';
+1419  042f a60a          	ld	a,#10
+1420  0431 6b13          	ld	(OFST+0,sp),a
+1422                     ; 292                 if(getSn_TX_FSR(SOCK_TCPS) >= 12)
+1424  0433 4f            	clr	a
+1425  0434 cd0000        	call	_getSn_TX_FSR
+1427  0437 a3000c        	cpw	x,#12
+1428  043a 251e          	jrult	L753
+1429                     ; 294                     if(send(SOCK_TCPS, txbuf, 6) <= 0)
+1431  043c 9c            	rvf
+1432  043d ae0006        	ldw	x,#6
+1433  0440 89            	pushw	x
+1434  0441 96            	ldw	x,sp
+1435  0442 1c0010        	addw	x,#OFST-3
+1436  0445 89            	pushw	x
+1437  0446 4f            	clr	a
+1438  0447 cd0000        	call	_send
+1440  044a 9c            	rvf
+1441  044b 5b04          	addw	sp,#4
+1442  044d cd0000        	call	c_lrzmp
+1444  0450 2c08          	jrsgt	L753
+1445                     ; 296                         disconnect(SOCK_TCPS);
+1447  0452 4f            	clr	a
+1448  0453 cd0000        	call	_disconnect
+1450                     ; 297                         break;
+1452  0456 ac910191      	jpf	L103
+1453  045a               L753:
+1454                     ; 303             if(changed)
+1456  045a 0d01          	tnz	(OFST-18,sp)
+1457  045c 2740          	jreq	L563
+1458                     ; 305                 txbuf[0]=curr_state[0];
+1460  045e 7b0a          	ld	a,(OFST-9,sp)
+1461  0460 6b0e          	ld	(OFST-5,sp),a
+1463                     ; 306                 txbuf[1]=curr_state[1];
+1465  0462 7b0b          	ld	a,(OFST-8,sp)
+1466  0464 6b0f          	ld	(OFST-4,sp),a
+1468                     ; 307                 txbuf[2]=curr_state[2];
+1470  0466 7b0c          	ld	a,(OFST-7,sp)
+1471  0468 6b10          	ld	(OFST-3,sp),a
+1473                     ; 308                 txbuf[3]=curr_state[3];
+1475  046a 7b0d          	ld	a,(OFST-6,sp)
+1476  046c 6b11          	ld	(OFST-2,sp),a
+1478                     ; 309                 txbuf[4]='\r';
+1480  046e a60d          	ld	a,#13
+1481  0470 6b12          	ld	(OFST-1,sp),a
+1483                     ; 310                 txbuf[5]='\n';
+1485  0472 a60a          	ld	a,#10
+1486  0474 6b13          	ld	(OFST+0,sp),a
+1488                     ; 312                 if(getSn_TX_FSR(SOCK_TCPS) >= 12)
+1490  0476 4f            	clr	a
+1491  0477 cd0000        	call	_getSn_TX_FSR
+1493  047a a3000c        	cpw	x,#12
+1494  047d 250f          	jrult	L763
+1495                     ; 314                     send(SOCK_TCPS, txbuf, 6);
+1497  047f ae0006        	ldw	x,#6
+1498  0482 89            	pushw	x
+1499  0483 96            	ldw	x,sp
+1500  0484 1c0010        	addw	x,#OFST-3
+1501  0487 89            	pushw	x
+1502  0488 4f            	clr	a
+1503  0489 cd0000        	call	_send
+1505  048c 5b04          	addw	sp,#4
+1506  048e               L763:
+1507                     ; 317                 prev_state[0]=curr_state[0];
+1509  048e 7b0a          	ld	a,(OFST-9,sp)
+1510  0490 6b06          	ld	(OFST-13,sp),a
+1512                     ; 318                 prev_state[1]=curr_state[1];
+1514  0492 7b0b          	ld	a,(OFST-8,sp)
+1515  0494 6b07          	ld	(OFST-12,sp),a
+1517                     ; 319                 prev_state[2]=curr_state[2];
+1519  0496 7b0c          	ld	a,(OFST-7,sp)
+1520  0498 6b08          	ld	(OFST-11,sp),a
+1522                     ; 320                 prev_state[3]=curr_state[3];
+1524  049a 7b0d          	ld	a,(OFST-6,sp)
+1525  049c 6b09          	ld	(OFST-10,sp),a
+1527  049e               L563:
+1528                     ; 323             delay_ms(10);   // ✅ keeps loop stable
+1530  049e ae000a        	ldw	x,#10
+1531  04a1 cd0000        	call	_delay_ms
+1533                     ; 325             break;
+1535  04a4 ac910191      	jpf	L103
+1536  04a8               L132:
+1537                     ; 327         case SOCK_CLOSE_WAIT:
+1537                     ; 328             disconnect(SOCK_TCPS);
+1539  04a8 4f            	clr	a
+1540  04a9 cd0000        	call	_disconnect
+1542                     ; 329             break;
+1544  04ac ac910191      	jpf	L103
+1545  04b0               L332:
+1546                     ; 331         case SOCK_FIN_WAIT:
+1546                     ; 332         case SOCK_CLOSING:
+1546                     ; 333         case SOCK_TIME_WAIT:
+1546                     ; 334         case SOCK_LAST_ACK:
+1546                     ; 335             close(SOCK_TCPS);
+1548  04b0 4f            	clr	a
+1549  04b1 cd0000        	call	_close
+1551                     ; 336             break;
+1553  04b4 ac910191      	jpf	L103
+1554  04b8               L532:
+1555                     ; 338         default:
+1555                     ; 339             break;
+1557  04b8 ac910191      	jpf	L103
+1558  04bc               L703:
+1560  04bc ac910191      	jpf	L103
+1711                     	xdef	_main
+1712                     	xdef	_GPIO_Config
+1713                     	xdef	_W5500_Init
+1714                     	xdef	_W5500_Reset
+1715                     	xdef	_SPI_Config
+1716                     	xdef	_spi_readbyte
+1717                     	xdef	_spi_writebyte
+1718                     	xdef	_wizchip_deselect
+1719                     	xdef	_wizchip_select
+1720                     	xdef	_delay_ms
+1721                     	xdef	_netinfo
+1722                     	switch	.ubsct
+1723  0000               _rxbuf:
+1724  0000 000000000000  	ds.b	32
+1725                     	xdef	_rxbuf
+1726                     	xdef	_changed
+1727                     	xdef	_rxsize
+1728                     	xdef	_txsize
+1729                     	xref	_recv
+1730                     	xref	_send
+1731                     	xref	_disconnect
+1732                     	xref	_listen
+1733                     	xref	_close
+1734                     	xref	_socket
+1735                     	xref	_wizchip_setnetinfo
+1736                     	xref	_wizchip_init
+1737                     	xref	_reg_wizchip_spi_cbfunc
+1738                     	xref	_reg_wizchip_cs_cbfunc
+1739                     	xref	_getSn_RX_RSR
+1740                     	xref	_getSn_TX_FSR
+1741                     	xref	_WIZCHIP_WRITE
+1742                     	xref	_WIZCHIP_READ
+1743                     	xref	_CLK_HSIPrescalerConfig
+1744                     	xref	_SPI_GetFlagStatus
+1745                     	xref	_SPI_ReceiveData
+1746                     	xref	_SPI_SendData
+1747                     	xref	_SPI_Cmd
+1748                     	xref	_SPI_Init
+1749                     	xref	_SPI_DeInit
+1750                     	xref	_GPIO_ReadInputPin
+1751                     	xref	_GPIO_WriteLow
+1752                     	xref	_GPIO_WriteHigh
+1753                     	xref	_GPIO_Init
+1754                     	xref.b	c_x
+1774                     	xref	c_lrzmp
+1775                     	xref	c_xymov
+1776                     	end

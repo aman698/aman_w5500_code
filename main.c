@@ -5,6 +5,10 @@
 #include "wizchip_conf.h"
 #include "socket.h"
 
+/* Hardware Reset Input */
+#define HARDRST_PORT    GPIOB
+#define HARDRST_PIN     GPIO_PIN_7
+
 /* W5500 SPI Pins */
 #define W5500_SCK_PORT  GPIOC
 #define W5500_SCK_PIN   GPIO_PIN_5
@@ -145,18 +149,35 @@ void W5500_Init(void)
 
     wizchip_setnetinfo(&netinfo);
 }
+void GPIO_Config(void)
+{
+        /* Relay Outputs */
+    GPIO_Init(GPIOB, GPIO_PIN_3, GPIO_MODE_OUT_PP_LOW_FAST); // R1
+    GPIO_Init(GPIOB, GPIO_PIN_2, GPIO_MODE_OUT_PP_LOW_FAST); // R2
+    GPIO_Init(GPIOB, GPIO_PIN_1, GPIO_MODE_OUT_PP_LOW_FAST); // R3
+    GPIO_Init(GPIOB, GPIO_PIN_0, GPIO_MODE_OUT_PP_LOW_FAST); // R4
+    GPIO_Init(GPIOC, GPIO_PIN_3, GPIO_MODE_OUT_PP_LOW_FAST); // R5
+    GPIO_Init(GPIOC, GPIO_PIN_4, GPIO_MODE_OUT_PP_LOW_FAST); // R6
 
-////////////////////////////////////////////////////
+    /* Inputs with pullups */
+    GPIO_Init(GPIOD, GPIO_PIN_2, GPIO_MODE_IN_PU_NO_IT); // DI1
+    GPIO_Init(GPIOD, GPIO_PIN_3, GPIO_MODE_IN_PU_NO_IT); // DI2
+    GPIO_Init(GPIOD, GPIO_PIN_4, GPIO_MODE_IN_PU_NO_IT); // DI3
+    GPIO_Init(GPIOD, GPIO_PIN_7, GPIO_MODE_IN_PU_NO_IT); // DI4
+}
 void main(void)
 {
     uint16_t len;
+    uint8_t i;
+    uint8_t send_enable = 0;
+    uint8_t txbuf[6];
 
     CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);
 
     SPI_Config();
+    GPIO_Config();
 
     W5500_Reset();
-
     W5500_Init();
 
     while(1)
@@ -165,10 +186,8 @@ void main(void)
         {
         case SOCK_CLOSED:
 
-            socket(SOCK_TCPS,
-                   Sn_MR_TCP,
-                   TCP_PORT,
-                   0);
+            socket(SOCK_TCPS, Sn_MR_TCP, TCP_PORT, 0);
+            send_enable = 0;
 
             break;
 
@@ -180,30 +199,91 @@ void main(void)
 
         case SOCK_ESTABLISHED:
 
-            if(getSn_IR(SOCK_TCPS)&Sn_IR_CON)
+            if(getSn_IR(SOCK_TCPS) & Sn_IR_CON)
             {
-                setSn_IR(SOCK_TCPS,Sn_IR_CON);
+                setSn_IR(SOCK_TCPS, Sn_IR_CON);
             }
 
-            len=getSn_RX_RSR(SOCK_TCPS);
+            len = getSn_RX_RSR(SOCK_TCPS);
 
-            if(len>0)
+            if(len > 0)
             {
-                if(len>sizeof(rxbuf))
-                    len=sizeof(rxbuf);
+                if(len > sizeof(rxbuf))
+                    len = sizeof(rxbuf);
 
-                recv(SOCK_TCPS,rxbuf,len);
+                for(i = 0; i < sizeof(rxbuf); i++)
+                    rxbuf[i] = 0;
 
-                if(rxbuf[0]=='h' &&
-                   rxbuf[1]=='e' &&
-                   rxbuf[2]=='l' &&
-                   rxbuf[3]=='l' &&
-                   rxbuf[4]=='o')
+                recv(SOCK_TCPS, rxbuf, len);
+
+                /* Stop sending */
+                if(rxbuf[0]=='o' && rxbuf[1]=='k' && rxbuf[2]=='k')
                 {
-                    send(SOCK_TCPS,
-                         (uint8_t*)"HELLO RECEIVED\r\n",
-                         16);
+                    send_enable = 0;
                 }
+
+                /* Start sending */
+                else if(rxbuf[0]=='o' && rxbuf[1]=='k')
+                {
+                    send_enable = 1;
+                }
+
+                /* Relay 1 */
+                else if(rxbuf[0]=='R' && rxbuf[1]=='1' && rxbuf[2]==',' && rxbuf[3]=='1')
+                    GPIO_WriteHigh(GPIOB, GPIO_PIN_3);
+
+                else if(rxbuf[0]=='R' && rxbuf[1]=='1' && rxbuf[2]==',' && rxbuf[3]=='0')
+                    GPIO_WriteLow(GPIOB, GPIO_PIN_3);
+
+                /* Relay 2 */
+                else if(rxbuf[0]=='R' && rxbuf[1]=='2' && rxbuf[2]==',' && rxbuf[3]=='1')
+                    GPIO_WriteHigh(GPIOB, GPIO_PIN_2);
+
+                else if(rxbuf[0]=='R' && rxbuf[1]=='2' && rxbuf[2]==',' && rxbuf[3]=='0')
+                    GPIO_WriteLow(GPIOB, GPIO_PIN_2);
+
+                /* Relay 3 */
+                else if(rxbuf[0]=='R' && rxbuf[1]=='3' && rxbuf[2]==',' && rxbuf[3]=='1')
+                    GPIO_WriteHigh(GPIOB, GPIO_PIN_1);
+
+                else if(rxbuf[0]=='R' && rxbuf[1]=='3' && rxbuf[2]==',' && rxbuf[3]=='0')
+                    GPIO_WriteLow(GPIOB, GPIO_PIN_1);
+
+                /* Relay 4 */
+                else if(rxbuf[0]=='R' && rxbuf[1]=='4' && rxbuf[2]==',' && rxbuf[3]=='1')
+                    GPIO_WriteHigh(GPIOB, GPIO_PIN_0);
+
+                else if(rxbuf[0]=='R' && rxbuf[1]=='4' && rxbuf[2]==',' && rxbuf[3]=='0')
+                    GPIO_WriteLow(GPIOB, GPIO_PIN_0);
+
+                /* Relay 5 */
+                else if(rxbuf[0]=='R' && rxbuf[1]=='5' && rxbuf[2]==',' && rxbuf[3]=='1')
+                    GPIO_WriteHigh(GPIOC, GPIO_PIN_3);
+
+                else if(rxbuf[0]=='R' && rxbuf[1]=='5' && rxbuf[2]==',' && rxbuf[3]=='0')
+                    GPIO_WriteLow(GPIOC, GPIO_PIN_3);
+
+                /* Relay 6 */
+                else if(rxbuf[0]=='R' && rxbuf[1]=='6' && rxbuf[2]==',' && rxbuf[3]=='1')
+                    GPIO_WriteHigh(GPIOC, GPIO_PIN_4);
+
+                else if(rxbuf[0]=='R' && rxbuf[1]=='6' && rxbuf[2]==',' && rxbuf[3]=='0')
+                    GPIO_WriteLow(GPIOC, GPIO_PIN_4);
+            }
+
+            if(send_enable)
+            {
+                txbuf[0] = (GPIO_ReadInputPin(GPIOD, GPIO_PIN_2)==RESET)?'1':'0';
+                txbuf[1] = (GPIO_ReadInputPin(GPIOD, GPIO_PIN_3)==RESET)?'1':'0';
+                txbuf[2] = (GPIO_ReadInputPin(GPIOD, GPIO_PIN_4)==RESET)?'1':'0';
+                txbuf[3] = (GPIO_ReadInputPin(GPIOD, GPIO_PIN_7)==RESET)?'1':'0';
+
+                txbuf[4] = '\r';
+                txbuf[5] = '\n';
+
+                send(SOCK_TCPS, txbuf, 6);
+
+                delay_ms(500);
             }
 
             break;
@@ -211,6 +291,7 @@ void main(void)
         case SOCK_CLOSE_WAIT:
 
             disconnect(SOCK_TCPS);
+            send_enable = 0;
 
             break;
         }
